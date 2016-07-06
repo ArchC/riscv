@@ -1,0 +1,225 @@
+/*
+* @file		riscv_isa.cpp
+* @version	1.0
+*
+*
+* @date
+* @brief 	The ArchC RISC-V functional model
+*
+*/
+
+AC_ISA(riscv){
+	ac_format Type_R = "%funct7:7 %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
+	ac_format Type_I = "%imm:12 %rs1:5 %funct3:3 %rd:5 %op:7"; 
+	ac_format Type_S = "%imm1:7 %rs2:5 %rs1:5 %funct3:3 %imm2:5 %op:7";
+	ac_format Type_U = "%imm:20 %rd:5 %op:7";
+	ac_format Type_I_shamt = "imm:7 shamt:5 rs1:5 funct3:3 rd:5 op:7";
+
+
+	//RV32IB
+	ac_instr<Type_R> ADD, SUB, SLL, SLT, SLTU, XOR, SRL, SRA, OR, AND; 
+
+	ac_instr<Type_I> LB, LH, LW, LBU, LHU;
+	ac_instr<Type_I> ADDI, SLTI, SLTIU, XORI, ORI, ANDI;
+	ac_instr<Type_I> JALR;
+	ac_instr<Type_I_shamt> SLLI, SRLI, SRAI;
+	ac_instr<Type_I> SCALL, SBREAK, RDCYCLE, RDCYCLEH, RDTIME, RDTIMEH, RDINSTRET, RDINSTRETH;
+	
+	ac_instr<Type_S> SB, SH, SW;
+	
+	ac_instr<Type_S> BEQ, BNE, BLT, BGE, BLTU, BGEU;
+	
+	ac_instr<Type_U> LUI, AUIPC;
+	
+	ac_instr<Type_U> JAL;
+
+	//RV32M
+	ac_instr<Type_R> MUL, MULH, MULHSU, MULHU;
+	ac_instr<Type_R> DIV, DIVU, REM, REMU;
+
+	//RISCV specific register names
+	ac_asm_map reg{
+		"$"[0..31] = [0..31];
+		"$zero" = 0;
+		"$fp" = 2;					// x2 = s0/fp
+		"$s0" = 2;
+		"$sp" = 14;
+		"$tp" = 15;
+		"$gp" = 31;
+	}
+
+	ISA_CTOR(riscv){
+
+		LUI.set_asm("LUI %reg, %exp", rd, imm);
+		LUI.set_decoder(op = 0x37);
+
+		AUIPC.set_asm("AUIPC %reg, %exp", rd, imm);
+		AUIPC.set_decoder(op = 0x17);
+
+		JAL.set_asm("JAL %reg, %exp", rd, imm);
+		JAL.set_decoder(op = 0x6F);
+
+		JALR.set_asm("JALR %reg, %reg, %exp", rd, rs1, imm);
+		JALR.set_decoder(funct3 = 0, op = 0x67);
+
+		BEQ.set_asm("BEQ %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		BEQ.set_decoder(funct3 = 0x0, op = 0x63);
+
+		BNE.set_asm("BNE %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		BNE.set_decoder(funct3 = 0x1, op = 0x63);
+
+		BLT.set_asm("BLT %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		BLT.set_decoder(funct3 = 0x4, op = 0x63);
+
+		BGE.set_asm("BGE %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		BGE.set_decoder(funct3 = 0x5, op = 0x63);
+
+		BLTU.set_asm("BLTU %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		BLTU.set_decoder(funct3 = 0x6, op = 0x63);
+
+		BGEU.set_asm("BGEU %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		BGEU.set_decoder(funct3 = 0x7, op = 0x63);
+
+		LB.set_asm("LB %reg, %reg, %exp", rd, rs1, imm);
+		LB.set_decoder(funct3 = 0x0, op = 0x03);
+
+		LH.set_asm("LH %reg, %reg, %exp", rd, rs1, imm);
+		LH.set_decoder(funct3 = 0x1, op = 0x03);
+
+		LW.set_asm("LW %reg, %reg, %exp", rd, rs1, imm);
+		LW.set_asm("LW %reg, %exp (%reg)", rd, imm, rs1);
+		LW.set_decoder(funct3 = 0x2, op = 0x03);
+
+		LBU.set_asm("LBU %reg, %reg, %exp", rd, rs1, imm);
+		LBU.set_decoder(funct3 = 0x4, op = 0x03);
+
+		LHU.set_asm("LHU %reg, %reg, %exp", rd, rs1, imm);
+		LHU.set_decoder(funct3 = 0x5, op = 0x03);
+
+		SB.set_asm("SB %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		SB.set_decoder(funct3 = 0x0, op = 0x23);
+
+		SH.set_asm("SH %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		SH.set_decoder(funct3 = 0x1, op = 0x23);
+
+		SW.set_asm("SW %reg, %reg, %exp", rs1, rs2, imm1+imm2);
+		SW.set_asm("SW %reg, %exp (%reg)", rs1, imm1+imm2, rs2);
+		SW.set_decoder(funct3 = 0x2, op = 0x23);
+
+		ADDI.set_asm("ADDI %reg, %reg, %exp", rd, rs1, imm);
+		ADDI.set_asm("MV %reg, %reg", rd, rs1, imm = 0);
+		ADDI.set_decoder(funct3 = 0x0, op = 0x13);
+
+		SLTI.set_asm("SLTI %reg, %reg, %exp", rd, rs1, imm);
+		SLTI.set_decoder(funct3 = 0x2, op = 0x13);
+
+		SLTIU.set_asm("SLTIU %reg, %reg, %exp", rd, rs1, imm);
+		//SLTIU.set_asm("SEQZ %reg, %reg", rd, rs1, imm = 0x001);
+		SLTIU.set_decoder(funct3 = 0x3, op = 0x13);
+
+		XORI.set_asm("XORI %reg, %reg, %exp", rd, rs1, imm);
+		//XORI.set_asm("NOT %reg, %reg", rd, rs1, imm = -0x001);
+		XORI.set_decoder(funct3 = 0x4, op = 0x13);
+
+		ORI.set_asm("ORI %reg, %reg, %exp", rd, rs1, imm);
+		ORI.set_decoder(funct3 = 0x6, op = 0x13);
+
+		ANDI.set_asm("ANDI %reg, %reg, %exp", rd, rs1, imm);
+		ANDI.set_decoder(funct3 = 0x7, op = 0x13);
+
+		//add instruction format for: SLLI, SRLI, SRAI
+		SLLI.set_asm("SLLI %reg, %reg, %exp", rd, rs1, shamt);
+		SLLI.set_decoder(imm = 0x00, funct3 = 0x1, op = 0x13);
+
+		SRLI.set_asm("SRLI %reg, %reg, %exp", rd, rs1, shamt);
+		SRLI.set_decoder(imm = 0x00, funct3 = 0x5, op = 0x13);
+
+		SRAI.set_asm("SRAI %reg, %reg, %exp", rd, rs1, shamt);
+		SRAI.set_decoder(imm = 0x20, funct3 = 0x7, op = 0x13);
+
+		ADD.set_asm("ADD %reg, %reg, %reg", rd, rs1, rs2);
+		ADD.set_decoder(funct7 = 0x00, funct3 = 0x0, op = 0x33);
+
+		SUB.set_asm("SUB %reg, %reg, %reg", rd, rs1, rs2);
+		SUB.set_decoder(funct7 = 0x20, funct3 = 0x0, op = 0x33);
+
+		SLL.set_asm("SLL %reg, %reg, %reg", rd, rs1, rs2);
+		SLL.set_decoder(funct7 = 0x00, funct3 = 0x1, op = 0x33);
+
+		SLT.set_asm("SLT %reg, %reg, %reg", rd, rs1, rs2);
+		SLT.set_decoder(funct7 = 0x00, funct3 = 0x2, op = 0x33);
+
+		SLTU.set_asm("SLTU %reg, %reg, %reg", rd, rs1, rs2);
+		SLTU.set_decoder(funct7 = 0x00, funct3 = 0x3, op = 0x33);
+
+		XOR.set_asm("XOR %reg, %reg, %reg", rd, rs1, rs2);
+		XOR.set_decoder(funct7 = 0x00, funct3 = 0x4, op = 0x33);
+
+		SRL.set_asm("SRL %reg, %reg, %reg", rd, rs1, rs2);
+		SRL.set_decoder(funct7 = 0x00, funct3 = 0x5, op = 0x33);
+
+		SRA.set_asm("SRA %reg, %reg, %reg", rd, rs1, rs2);
+		SRA.set_decoder(funct7 = 0x20, funct3 = 0x5, op = 0x33);
+
+		OR.set_asm("OR %reg, %reg, %reg", rd, rs1, rs2);
+		OR.set_decoder(funct7 = 0x00, funct3 = 0x6, op = 0x33);
+
+		AND.set_asm("AND %reg, %reg, %reg", rd, rs1, rs2);
+		AND.set_decoder(funct7 = 0x00, funct3 = 0x7, op = 0x33);
+
+		//FENCE and FENCE.I 
+
+		SCALL.set_asm("SCALL");
+		SCALL.set_decoder(imm = 0x000, rs1 = 0x00, funct3 = 0x0, rd = 0x00, op = 0x73);
+		
+		SBREAK.set_asm("SBREAK");
+		SBREAK.set_decoder(imm = 0x001, rs1 = 0x00, funct3 = 0x0, rd = 0x00, op = 0x73);
+
+		RDCYCLE.set_asm("RDCYCLE %reg", rd);
+		RDCYCLE.set_decoder(imm = 0x000, rs1 = 0x00, funct3 = 0x0, op = 0x73);
+
+		RDCYCLEH.set_asm("RDCYCLEH %reg", rd);
+		RDCYCLEH.set_decoder(imm = 0x001, rs1 = 0x00, funct3 = 0x0, op = 0x73);
+
+		RDTIME.set_asm("RDTIME %reg", rd);
+		RDTIME.set_decoder(imm = 0xC00, rs1 = 0x00, funct3 = 0x2, op = 0x73);
+
+		RDTIMEH.set_asm("RDTIMEH %reg", rd);
+		RDTIMEH.set_decoder(imm = 0xC80, rs1 = 0x00, funct3 = 0x2, op = 0x73);
+
+		RDINSTRET.set_asm("RDINSTRET %reg", rd);
+		RDINSTRET.set_decoder(imm = 0xC02, rs1 = 0x00, funct3 = 0x2, op = 0x73);
+
+		RDINSTRETH.set_asm("RDINSTRETH %reg", rd);
+		RDINSTRETH.set_decoder(imm = 0xC82, rs1 = 0x00, funct3 = 0x2, op = 0x73);
+
+		//optional properties to optimize compiled simulation
+
+
+		//RV32M
+
+		MUL.set_asm("MUL %reg %reg %reg", rd, rs1, rs2);
+		MUL.set_decoder(funct7 = 0x01, funct3 = 0x0, op = 0x63);
+
+		MULH.set_asm("MULH %reg %reg %reg", rd, rs1, rs2);
+		MULH.set_decoder(funct7 = 0x01, funct3 = 0x1, op = 0x63);
+
+		MULHSU.set_asm("MULHSU %reg %reg %reg", rd, rs1, rs2);
+		MULHSU.set_decoder(funct7 = 0x01, funct3 = 0x2, op = 0x63);
+
+		MULHU.set_asm("MULHU %reg %reg %reg", rd, rs1, rs2);
+		MULHU.set_decoder(funct7 = 0x01, funct3 = 0x3, op = 0x63);
+
+		DIV.set_asm("DIV %reg %reg %reg", rd, rs1, rs2);
+		DIV.set_decoder(funct7 = 0x01, funct3 = 0x4, op = 0x63);
+
+		DIVU.set_asm("DIVU %reg %reg %reg", rd, rs1, rs2);
+		DIVU.set_decoder(funct7 = 0x01, funct3 = 0x5, op = 0x63);
+
+		REM.set_asm("REM %reg %reg %reg", rd, rs1, rs2);
+		REM.set_decoder(funct7 = 0x01, funct3 = 0x6, op = 0x63);
+
+		REMU.set_asm("REMU %reg %reg %reg", rd, rs1, rs2);
+		REMU.set_decoder(funct7 = 0x01, funct3 = 0x7, op = 0x63);
+	};
+};
