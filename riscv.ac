@@ -1,0 +1,16 @@
+AC_ARCH(riscv){
+	
+	ac_mem	DM:512M;
+	ac_regbank RB:32;
+	
+	
+	ac_wordsize 32;
+
+	ac_reg id;
+
+	ARCH_CTOR(riscv){
+
+		ac_isa("riscv_isa.ac");
+		set_endian("little");	
+	};
+};
