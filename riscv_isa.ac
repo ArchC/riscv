@@ -39,6 +39,7 @@ AC_ISA(riscv){
   ac_instr<Type_R> DIV, DIVU, REM, REMU;
 
   //RV32A
+  ac_instr<Type_R> LR_W, SC_W;
   ac_instr<Type_R> AMOSWAP_W, AMOADD_W, AMOXOR_W, AMOAND_W, AMOOR_W, AMOMIN_W, AMOMAX_W, AMOMINU_W, AMOMAXU_W;
 
   //RISC-V specific register names
@@ -227,6 +228,12 @@ ISA_CTOR(riscv){
   REMU.set_decoder(funct7 = 0x01, funct3 = 0x7, op = 0x33);
 
   //RV32A
+  LR_W.set_asm("LR %reg, %reg", rd, rs1);
+  LR_W.set_decoder(funct7 = 0x1, funct3 = 0x2, op = 0x2f);
+
+  SC_W.set_asm("SC %reg, %reg, %reg", rd, rs1, rs2);
+  SC_W.set_decoder(funct7 = 0x2, funct3 = 0x2, op = 0x2f);
+
   AMOSWAP_W.set_asm("AMOSWAP.W %reg, %reg, %reg", rd, rs1, rs2);
   AMOSWAP_W.set_decoder(funct7 = 0x04, funct3 = 0x2, op = 0x2f);  
 

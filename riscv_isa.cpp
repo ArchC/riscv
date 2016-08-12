@@ -812,6 +812,17 @@ void ac_behavior(REMU) {
 }
 
 
+void ac_behavior(LR_W){
+  RB[rd] = DM.read(RB[rs1]);
+}
+
+
+void ac_behavior(SC_W){
+  DM.write(RB[rs1], RB[rs2]);
+  RB[rd] = 0; //indicating success
+}
+
+
 void ac_behavior (AMOSWAP_W){
   dbg_printf("AMOSWAP.W r%d, r%d, r%d\n", rd, rs1, rs2);
   RB[rd] = DM.read(RB[rs1]);
