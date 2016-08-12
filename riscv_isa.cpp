@@ -810,3 +810,105 @@ void ac_behavior(REMU) {
     RB[rd] = (ac_Uword)RB[rs1] % (ac_Uword)RB[rs2];
   dbg_printf("Result = %#x\n\n", (ac_Uword)RB[rd]);
 }
+
+
+void ac_behavior (AMOSWAP_W){
+  dbg_printf("AMOSWAP.W r%d, r%d, r%d\n", rd, rs1, rs2);
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  int temp;
+  temp = RB[rs2];
+  RB[rs2] = RB[rd];
+  RB[rd] = temp;
+  dbg_printf("After swapping RB[rd] = %d\n\n", RB[rd]);
+  DM.write(RB[rs1], RB[rd]);
+}
+
+
+void ac_behavior (AMOADD_W){
+  dbg_printf("AMOADD.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  DM.write(RB[rs1], (RB[rd] + RB[rs2]));
+  dbg_printf("Result = %d\n\n", RB[rd] + RB[rs2]);
+}
+
+
+void ac_behavior (AMOXOR_W){
+  dbg_printf("AMOXOR.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  DM.write(RB[rs1], (RB[rd] ^ RB[rs2]));
+  dbg_printf("Result = %d\n\n", RB[rd] ^ RB[rs2]);
+}
+
+
+void ac_behavior (AMOAND_W){
+  dbg_printf("AMOAND.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  DM.write(RB[rs1], (RB[rd] & RB[rs2]));
+  dbg_printf("Result = %d\n\n", RB[rd] & RB[rs2]);
+}
+
+
+void ac_behavior (AMOOR_W){
+  dbg_printf("AMOOR.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  DM.write(RB[rs1], (RB[rd] | RB[rs2]));
+  dbg_printf("Result = %d\n\n", RB[rd] | RB[rs2]);
+}
+
+
+void ac_behavior (AMOMIN_W){
+  dbg_printf("AMOMIN.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  if(RB[rd] < RB[rs2])  
+    DM.write(RB[rs1], RB[rd]);
+  else
+    DM.write(RB[rs1], RB[rs2]);
+}
+
+
+void ac_behavior (AMOMAX_W){
+  dbg_printf("AMOMAX.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n\n", RB[rs2]);
+  if(RB[rd] > RB[rs2])  
+    DM.write(RB[rs1], RB[rd]);
+  else
+    DM.write(RB[rs1], RB[rs2]);
+}
+
+
+void ac_behavior (AMOMINU_W){
+  dbg_printf("AMOMINU.W r%d, r%d, r%d\n", rd, rs1, rs2);  
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n\n", RB[rs2]);
+  if((ac_Uword)RB[rd] < (ac_Uword)RB[rs2])  
+    DM.write(RB[rs1], RB[rd]);
+  else
+    DM.write(RB[rs1], RB[rs2]);
+}
+
+
+void ac_behavior (AMOMAXU_W){
+  dbg_printf("AMOMAXU.W r%d, r%d, r%d\n", rd, rs1, rs2); 
+  RB[rd] = DM.read(RB[rs1]);
+  dbg_printf("RB[rd] = %d\n", RB[rd]);
+  dbg_printf("RB[rs2] = %d\n", RB[rs2]);
+  if((ac_Uword)RB[rd] > (ac_Uword)RB[rs2])  
+    DM.write(RB[rs1], RB[rd]);
+  else
+    DM.write(RB[rs1], RB[rs2]);
+}
