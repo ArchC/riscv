@@ -16,7 +16,7 @@
 #include "riscv_bhv_macros.H"
 
 // Uncomment for debug Information
-//#define DEBUG_MODEL
+#define DEBUG_MODEL
 #include "ac_debug_model.H"
 
 #define Ra 1
@@ -922,4 +922,32 @@ void ac_behavior (AMOMAXU_W){
     DM.write(RB[rs1], RB[rd]);
   else
     DM.write(RB[rs1], RB[rs2]);
+}
+
+void ac_behavior(FLW){
+  int offset;
+  offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+  dbg_printf("FLW r%d, r%d, %d\n", rd, rs1, offset);
+  int sign_ext;
+  if (imm4 == 1)
+    sign_ext = offset | 0xFFFFF000;
+  else
+    sign_ext = offset;
+  RBF[rd] = DM.read(RB[rs1] + sign_ext);  
+  dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
+  dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+void ac_behavior(FSW){
+  int imm;
+  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+  dbg_printf("FSW r%d, r%d, %d\n", rs1, rs2, imm);
+  int sign_ext;
+  if ((imm >> 11) == 1)
+    sign_ext = imm | 0xFFFFF000;
+  else
+    sign_ext = imm;
+  DM.write(RB[rs1] + sign_ext, RBF[rs2]);
+  dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
 }

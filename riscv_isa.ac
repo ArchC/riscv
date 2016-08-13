@@ -42,6 +42,10 @@ AC_ISA(riscv){
   ac_instr<Type_R> LR_W, SC_W;
   ac_instr<Type_R> AMOSWAP_W, AMOADD_W, AMOXOR_W, AMOAND_W, AMOOR_W, AMOMIN_W, AMOMAX_W, AMOMINU_W, AMOMAXU_W;
 
+  //RV32F
+  ac_instr<Type_I> FLW;
+  ac_instr<Type_S> FSW;
+
   //RISC-V specific register names
   ac_asm_map reg{
   "$"[0..31] = [0..31];
@@ -260,5 +264,12 @@ ISA_CTOR(riscv){
 
   AMOMAXU_W.set_asm("AMOMAXU.W %reg, %reg, %reg", rd, rs1, rs2);
   AMOMAXU_W.set_decoder(funct7 = 0x70, funct3 = 0x2, op = 0x2f);  
+
+  //RV32F
+  FLW.set_asm("FLW %reg, %reg, %exp", rd, rs1, imm4+imm3+imm2+imm1);
+  FLW.set_decoder(funct3 = 0x2, op = 0x07);
+
+  FSW.set_asm("FSW %reg, %reg, %exp", rs1, rs2, imm4+imm3+imm2+imm1);
+  FSW.set_decoder(funct3 = 0x2, op = 0x27);
   };
 };
