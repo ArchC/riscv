@@ -89,10 +89,7 @@ void ac_behavior(SUB) {
 // Instruction SLL behavior method.
 void ac_behavior(SLL) {
   dbg_printf("SLL r%d, r%d, r%d\n", rd, rs1, rs2);
-  short int shamt = RB[rs2];
-  shamt = shamt << 11;
-  shamt = shamt >> 11;
-  RB[rd] = RB[rs1] << shamt;
+  RB[rd] = RB[rs1] << RB[rs2];
   dbg_printf("RB[rs1] = %d\n", RB[rs1]);
   dbg_printf("RB[rs2] = %d\n", RB[rs2]);
   dbg_printf("Result = %d\n\n", RB[rd]);
@@ -138,10 +135,7 @@ void ac_behavior(XOR) {
 // Instruction SRL behavior method.
 void ac_behavior(SRL) {
   dbg_printf("SRL r%d, r%d, r%d\n", rd, rs1, rs2);
-  short int shamt = RB[rs2];
-  shamt = shamt << 11;
-  shamt = shamt >> 11;
-  RB[rd] = RB[rs1] >> shamt;
+  RB[rd] = RB[rs1] >> RB[rs2];
   dbg_printf("RB[rs1] = %d\n", RB[rs1]);
   dbg_printf("RB[rs2] = %d\n", RB[rs2]);
   dbg_printf("Result = %d\n\n", RB[rd]);
@@ -151,10 +145,7 @@ void ac_behavior(SRL) {
 // Instruction SRA behavior method.
 void ac_behavior(SRA) {
   dbg_printf("SRA r%d, r%d, r%d\n", rd, rs1, rs2);
-  short int shamt = RB[rs2];
-  shamt = shamt << 11;
-  shamt = shamt >> 11;
-  RB[rd] = ((ac_Sword) RB[rs1]) >> shamt;
+  RB[rd] = ((ac_Sword) RB[rs1]) >> RB[rs2];
   dbg_printf("RB[rs1] = %d\n", RB[rs1]);
   dbg_printf("RB[rs2] = %d\n", RB[rs2]);
   dbg_printf("Result = %d\n\n", RB[rd]);
