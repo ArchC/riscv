@@ -1,11 +1,12 @@
 /*
 * @file		riscv_isa.cpp
 * @version	1.0
-*
+* @author   Pavani Tripathi
 *
 * @date
 * @brief 	The ArchC RISC-V functional model
 *
+* @source   http://people.eecs.berkeley.edu/~krste/papers/riscv-spec-2.0.pdf
 */
 
 AC_ISA(riscv){
@@ -45,13 +46,18 @@ AC_ISA(riscv){
 
   //RV32A
   ac_instr<Type_R> LR_W, SC_W;
-  ac_instr<Type_R> AMOSWAP_W, AMOADD_W, AMOXOR_W, AMOAND_W, AMOOR_W, AMOMIN_W, AMOMAX_W, AMOMINU_W, AMOMAXU_W;
+  ac_instr<Type_R> AMOSWAP_W, AMOADD_W, AMOXOR_W, AMOAND_W, AMOOR_W;
+  ac_instr<Type_R> AMOMIN_W, AMOMAX_W, AMOMINU_W, AMOMAXU_W;
 
   //RV32F
   ac_instr<Type_I> FLW;
   ac_instr<Type_S> FSW;
   ac_instr<Type_R> FADD_S, FSUB_S, FMUL_S, FDIV_S, FMIN_S, FMAX_S, FSQRT_S;
   ac_instr<Type_R4> FMADD_S, FMSUB_S, FNMSUB_S, FNMADD_S;
+
+  //RV32D
+  ac_instr<Type_I> FLD;
+  ac_instr<Type_S> FSD;
 
   //RISC-V specific register names
   ac_asm_map reg{
@@ -319,5 +325,11 @@ ISA_CTOR(riscv){
 
   FMADD_S.set_asm("FMADD.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
   FMADD_S.set_decoder(funct2 = 0, funct3 = 0x3, op = 0x43);
+
+  FLD.set_asm("FLD %reg, %reg, %imm", rd, rs1, imm4+imm3+imm2+imm1);
+  FLD.set_decoder(funct3 = 0x3, op=0x07);
+
+  FSD.set_asm("FSD %reg, %reg, %exp", rs1, rs2, imm4+imm3+imm2+imm1);
+  FSD.set_decoder(funct3 = 0x3, op = 0x27);
   };
 };

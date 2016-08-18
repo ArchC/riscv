@@ -1004,3 +1004,27 @@ void ac_behavior(FNMADD_S){
   RBF[rd] = (-(RBF[rs1]*RBF[rs2]+RBF[rs3]));
   dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
 }
+
+
+void ac_behavior(FLD){
+  int imm;
+  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+  dbg_printf("FLD r%d, r%d, %d\n", rd, rs1, imm);
+  int sign_ext;
+  sign_ext = sign_extend(imm, 12);
+  RBF[rd] = DM.read(RB[rs1] + sign_ext);  
+  dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
+  dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+
+void ac_behavior(FSD){
+  int imm;
+  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+  dbg_printf("FSD r%d, r%d, %d\n", rs1, rs2, imm);
+  int sign_ext;
+  sign_ext = sign_extend(imm, 12);
+  DM.write(RB[rs1] + sign_ext, RBF[rs2]);
+  dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
+}
