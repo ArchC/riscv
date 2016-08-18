@@ -188,15 +188,9 @@ void ac_behavior(LB) {
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("LB r%d, r%d, %d\n", rd, rs1, offset);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = offset | 0xFFFFF000;
-  else
-    sign_ext = offset;
+  sign_ext = sign_extend(offset, 12);
   byte = DM.read_byte(RB[rs1] + sign_ext);
-  if ((byte >> 7) == 1)
-    RB[rd] = byte | 0xFFFFFFF00;
-  else
-    RB[rd] = byte;
+  RB[rd] = sign_extend(byte, 7);
   dbg_printf("RB[rs1] = %#x, byte = %#x\n", RB[rs1], byte);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
   dbg_printf("Result = %#x\n\n", RB[rd]);
@@ -210,15 +204,9 @@ void ac_behavior(LH) {
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("LH r%d, r%d, %d\n", rd, rs1, offset);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = offset | 0xFFFFF000;
-  else
-    sign_ext = offset;
+  sign_ext = sign_extend(offset, 12);
   half = DM.read_half(RB[rs1] + sign_ext);
-  if ((half >> 15) == 1)
-    RB[rd] = half | 0xFFFF0000;
-  else
-    RB[rd] = half;
+  RB[rd] = sign_extend(half, 16);
   dbg_printf("RB[rs1] = %#x, half = %#x\n", RB[rs1], half);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
   dbg_printf("Result = %#x\n\n", RB[rd]);
@@ -230,11 +218,8 @@ void ac_behavior(LW) {
   int offset;
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("LW r%d, r%d, %d\n", rd, rs1, offset);
-  int sign_ext;
-  if (imm4 == 1)
-    sign_ext = offset | 0xFFFFF000;
-  else
-    sign_ext = offset;
+  int sign_ext;  
+  sign_ext = sign_extend(offset, 12);
   RB[rd] = DM.read(RB[rs1] + sign_ext);  
   dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
@@ -248,10 +233,7 @@ void ac_behavior(LBU) {
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("LBU r%d, r%d, %d\n", rd, rs1, offset);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = offset | 0xFFFFF000;
-  else
-    sign_ext = offset;
+  sign_ext = sign_extend(offset, 12);
   RB[rd] = DM.read_byte(RB[rs1] + sign_ext);
   dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
@@ -265,10 +247,7 @@ void ac_behavior(LHU) {
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("LHU r%d, r%d, %d\n", rd, rs1, offset);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = offset | 0xFFFFF000;
-  else
-    sign_ext = offset;
+  sign_ext = sign_extend(offset, 12);
   RB[rd] = DM.read_half(RB[rs1] + sign_ext);
   dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
@@ -286,10 +265,7 @@ void ac_behavior(ADDI) {
   } 
   else {
     int sign_ext;
-    if (imm4 == 1)
-      sign_ext = imm | 0xFFFFF000;
-    else
-      sign_ext = imm;
+    sign_ext = sign_extend(imm, 12);
     RB[rd] = RB[rs1] + sign_ext;
     dbg_printf("RB[rs1] = %d\n", RB[rs1]);
     dbg_printf("imm = %d\n", sign_ext);
@@ -304,10 +280,7 @@ void ac_behavior(SLTI) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("SLTI r%d, r%d, %d\n", rd, rs1, imm);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   if (RB[rs1] < sign_ext)
     RB[rd] = 1;
   else
@@ -324,10 +297,7 @@ void ac_behavior(SLTIU) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("SLTIU r%d, r%d, %d\n", rd, rs1, imm);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   if ((ac_Uword)RB[rs1] < (ac_Uword)sign_ext)
     RB[rd] = 1;
   else
@@ -342,10 +312,7 @@ void ac_behavior(XORI) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("XORI r%d, r%d, %d\n", rd, rs1, imm);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   RB[rd] = RB[rs1] ^ sign_ext;
   dbg_printf("Result = %#x\n\n", RB[rd]);
 }
@@ -357,10 +324,7 @@ void ac_behavior(ORI) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("ORI r%d, r%d, %d\n", rd, rs1, imm);
   int sign_ext;
-  if ((imm >> 11) == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   RB[rd] = RB[rs1] | sign_ext;
   dbg_printf("Result = %#x\n\n", RB[rd]);
 }
@@ -372,10 +336,7 @@ void ac_behavior(ANDI) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("ANDI r%d, r%d, %d\n", rd, rs1, imm);
   int sign_ext;
-  if ((imm >> 11) == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   RB[rd] = RB[rs1] & sign_ext;
   dbg_printf("Result = %#x\n\n", RB[rd]);
 }
@@ -388,17 +349,13 @@ void ac_behavior(JALR) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("JALR r%d, r%d, %d\n", rd, rs1, imm);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   target_addr = RB[rs1] + sign_ext;
   target_addr = target_addr >> 1;
   target_addr = target_addr << 1;
   if(rd != 0)
     RB[rd] = ac_pc;
   ac_pc = target_addr;
-  //ac_pc = (ac_pc & 0xF0000000) | target_addr, 1;
   dbg_printf("Target = %#x\n", (ac_pc & 0xF0000000) | target_addr);
   dbg_printf("Target = %#x\n", target_addr);
   dbg_printf("Return = %#x\n\n", RB[rd]);
@@ -502,10 +459,7 @@ void ac_behavior(SB) {
   dbg_printf("SB r%d, r%d, %d\n", rs1, rs2, imm);
   unsigned char byte = RB[rs2] & 0xFF;
   int sign_ext;
-  if ((imm >> 11) == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   DM.write_byte(RB[rs1] + sign_ext, byte);
   dbg_printf("addr: %#x\n", RB[rs1]+sign_ext);
   dbg_printf("Result: %#x\n\n\n", byte);		
@@ -518,10 +472,7 @@ void ac_behavior(SH) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("SH r%d, r%d, %d\n", rs1, rs2, imm);
   int sign_ext;
-  if ((imm >> 11) == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   unsigned short int half = RB[rs2] & 0xFFFF;
   DM.write_half(RB[rs1] + sign_ext, half);
   dbg_printf("addr: %#x\n", RB[rs1]+sign_ext);
@@ -535,10 +486,7 @@ void ac_behavior(SW) {
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("SW r%d, r%d, %d\n", rs1, rs2, imm);
   int sign_ext;
-  if ((imm >> 11) == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   DM.write(RB[rs1] + sign_ext, RB[rs2]);
   dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
 }
@@ -935,10 +883,7 @@ void ac_behavior(FLW){
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("FLW r%d, r%d, %d\n", rd, rs1, offset);
   int sign_ext;
-  if (imm4 == 1)
-    sign_ext = offset | 0xFFFFF000;
-  else
-    sign_ext = offset;
+  sign_ext = sign_extend(offset, 12);
   RBF[rd] = DM.read(RB[rs1] + sign_ext);  
   dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
@@ -950,10 +895,7 @@ void ac_behavior(FSW){
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
   dbg_printf("FSW r%d, r%d, %d\n", rs1, rs2, imm);
   int sign_ext;
-  if ((imm >> 11) == 1)
-    sign_ext = imm | 0xFFFFF000;
-  else
-    sign_ext = imm;
+  sign_ext = sign_extend(imm, 12);
   DM.write(RB[rs1] + sign_ext, RBF[rs2]);
   dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
 }
