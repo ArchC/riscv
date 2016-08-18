@@ -14,6 +14,7 @@
 #include "riscv_isa.H"
 #include "riscv_isa_init.cpp"
 #include "riscv_bhv_macros.H"
+#include "math.h"
 
 // Uncomment for debug Information
 #define DEBUG_MODEL
@@ -38,6 +39,7 @@ void ac_behavior(instruction) {
 
 // Instruction Format behavior methods
 void ac_behavior(Type_R) {}
+void ac_behavior(Type_R4) {}
 void ac_behavior(Type_I) {}
 void ac_behavior(Type_S) {}
 void ac_behavior(Type_SB) {}
@@ -50,7 +52,11 @@ void ac_behavior(begin) {
   dbg_printf("@@@ begin behavior @@@\n");
 
   for (int regNum = 0; regNum < 32; regNum++)
-    RB[regNum] = 0;
+    {
+      RB[regNum] = 0;
+      RBF[regNum] = 0;
+    }
+  fcsr = 0;
 }
 
 
@@ -950,4 +956,118 @@ void ac_behavior(FSW){
     sign_ext = imm;
   DM.write(RB[rs1] + sign_ext, RBF[rs2]);
   dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
+}
+
+
+void ac_behavior(FADD_S){
+  dbg_printf("FADD.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  RBF[rd] = RBF[rs1] + RBF[rs2];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+
+void ac_behavior(FSUB_S){
+  dbg_printf("FSUB.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  RBF[rd] = RBF[rs1] - RBF[rs2];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+
+void ac_behavior(FMUL_S){
+  dbg_printf("FMUL.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  RBF[rd] = RBF[rs1] * RBF[rs2];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+} 
+
+
+void ac_behavior(FDIV_S){
+  dbg_printf("FDIV.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  RBF[rd] = RBF[rs1]/RBF[rs2];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);  
+}
+
+
+void ac_behavior(FMIN_S){
+  dbg_printf("FMIN.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  if(RBF[rs1] < RBF[rs2])
+    RBF[rd] = RBF[rs1];
+  else
+    RBF[rd] = RBF[rs2];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);   
+}
+
+
+void ac_behavior(FMAX_S){
+  dbg_printf("FMAX.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  if(RBF[rs1] > RBF[rs2])
+    RBF[rd] = RBF[rs1];
+  else
+    RBF[rd] = RBF[rs2];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);   
+}
+
+
+void ac_behavior(FSQRT_S){
+  dbg_printf("FSQRT.S r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  if(RBF[rs1] < 0)
+    {
+       dbg_printf("Invalid!");
+       stop();
+    }
+  else
+    RBF[rd] = sqrt(RBF[rs1]);
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);   
+}
+
+
+void ac_behavior(FMADD_S){
+  dbg_printf("FMADD.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
+  RBF[rd] = RBF[rs1]*RBF[rs2]+RBF[rs3];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+
+void ac_behavior(FMSUB_S){
+  dbg_printf("FMSUB.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
+  RBF[rd] = RBF[rs1]*RBF[rs2]-RBF[rs3];
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+
+void ac_behavior(FNMSUB_S){
+  dbg_printf("FNMSUB.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
+  RBF[rd] = (-(RBF[rs1]*RBF[rs2]-RBF[rs3]));
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+}
+
+
+void ac_behavior(FNMADD_S){
+  dbg_printf("FNMADD.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
+  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
+  RBF[rd] = (-(RBF[rs1]*RBF[rs2]+RBF[rs3]));
+  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
 }
