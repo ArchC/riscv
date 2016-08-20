@@ -56,6 +56,7 @@ AC_ISA(riscv){
   ac_instr<Type_R4> FMADD_S, FMSUB_S, FNMSUB_S, FNMADD_S;
   ac_instr<Type_R> FCVT_W_S, FCVT_WU_S, FCVT_S_WU, FCVT_S_W;
   ac_instr<Type_R> FMV_X_S, FMV_S_X; 
+  ac_instr<Type_R> FEQ_S, FLT_S, FLE_S;
 
   //RV32D
   ac_instr<Type_I> FLD;
@@ -201,8 +202,6 @@ ISA_CTOR(riscv){
   AND.set_asm("AND %reg, %reg, %reg", rd, rs1, rs2);
   AND.set_decoder(funct7 = 0x00, funct3 = 0x7, op = 0x33);
 
-  //FENCE and FENCE.I 
-
   SCALL.set_asm("SCALL");
   SCALL.set_decoder(imm4 = 0, imm3 = 0, imm2 = 0, imm1 = 0, rs1 = 0x00, funct3 = 0x0, rd = 0x00, op = 0x73);
 		
@@ -347,6 +346,15 @@ ISA_CTOR(riscv){
 
   FMV_S_X.set_asm("FMV.S.X %reg, %reg", rd, rs1);
   FMV_S_X.set_decoder(funct7=0x78, rs1 = 0, funct3 = 0, op = 0x53);
+
+  FEQ_S.set_asm("FEQ.S %reg, %reg, %reg", rd, rs1, rs2);
+  FEQ_S.set_decoder(funct7 = 0x50, funct3 = 2, op = 0x53);
+
+  FLT_S.set_asm("FLT.S %reg, %reg, %reg", rd, rs1, rs2);
+  FLT_S.set_decoder(funct7 = 0x50, funct3 = 1, op = 0x53);
+
+  FLE_S.set_asm("FLE.S %reg, %reg, %reg", rd, rs1, rs2);
+  FLE_S.set_decoder(funct7 = 0x50, funct3 = 0, op = 0x53);
 
   //RV32D
   FLD.set_asm("FLD %reg, %reg, %imm", rd, rs1, imm4+imm3+imm2+imm1);

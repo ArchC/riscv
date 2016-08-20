@@ -1074,7 +1074,7 @@ void ac_behavior(FCVT_S_WU){
 
 // Instruction FMV_X_S behavior method
 void ac_behavior(FMV_X_S){
-  dbg_printf("FMV.X.S r%d, r%d", rd, rs1);
+  dbg_printf("FMV.X.S r%d, r%d \n", rd, rs1);
   dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
   RB[rd] = (int)load_float(rs1);
   dbg_printf("RB[rd] = %d \n \n", RB[rd]);
@@ -1083,10 +1083,64 @@ void ac_behavior(FMV_X_S){
 
 // Instruction FMV_S_X behavior method
 void ac_behavior(FMV_S_X){
-  dbg_printf("FMV.S.X r%d, r%d", rd, rs1);
+  dbg_printf("FMV.S.X r%d, r%d \n", rd, rs1);
   dbg_printf("RB[rs1] = %d \n", RB[rs1]);
   save_float(RB[rs1], rd);
   dbg_printf("RBF[rd] = %f \n \n", load_float(rd));
+}
+
+
+// Instruction FEQ_S behavior method
+void ac_behavior(FEQ_S){
+  dbg_printf("FEQ.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
+  if((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_float(rs1) == load_float(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLE_S behavior method
+void ac_behavior(FLE_S){
+  dbg_printf("FLE.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
+  if((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_float(rs1) <= load_float(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLT_S behavior method
+void ac_behavior(FLT_S){
+  dbg_printf("FLT.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
+  if((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_float(rs1) < load_float(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
 }
 
 
