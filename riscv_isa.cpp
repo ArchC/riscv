@@ -1144,6 +1144,15 @@ void ac_behavior(FLT_S){
 }
 
 
+// Instruction FMV.S behavior method
+void ac_behavior(FMV_S){
+  dbg_printf("FMV.S r%d, r%d", rd, rs1);
+  float temp;
+  temp = load_float(rs1);
+  save_float(temp, rd);
+}
+
+
 // Instruction FLD behavior method
 void ac_behavior(FLD){
   int imm;
@@ -1383,9 +1392,9 @@ void ac_behavior(FCVT_D_S){
 
 void ac_behavior(FMV_D){
   dbg_printf("FMV.D r%d, r%d", rd, rs1);
-  float temp;
-  temp = load_float(rs1);
-  save_float(temp, rd);
+  double temp;
+  temp = load_double(rs1);
+  save_double(temp, rd);
 }
 
 

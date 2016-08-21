@@ -57,6 +57,7 @@ AC_ISA(riscv){
   ac_instr<Type_R> FCVT_W_S, FCVT_WU_S, FCVT_S_WU, FCVT_S_W;
   ac_instr<Type_R> FMV_X_S, FMV_S_X; 
   ac_instr<Type_R> FEQ_S, FLT_S, FLE_S;
+  ac_instr<Type_R> FMV_S;
 
   //RV32D
   ac_instr<Type_I> FLD;
@@ -356,6 +357,9 @@ ISA_CTOR(riscv){
 
   FLE_S.set_asm("FLE.S %reg, %reg, %reg", rd, rs1, rs2);
   FLE_S.set_decoder(funct7 = 0x50, funct3 = 0, op = 0x53);
+
+  FMV_S.set_asm("FMV.S %reg, %reg", rd, rs1);
+  FMV_S.set_decoder(funct7 = 0x10, op = 0x53);
 
   //RV32D
   FLD.set_asm("FLD %reg, %reg, %imm", rd, rs1, imm4+imm3+imm2+imm1);
