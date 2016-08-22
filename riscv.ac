@@ -1,10 +1,23 @@
+/*
+*
+* @file        riscv_isa.cpp
+* @version     1.0
+* 
+*
+* @date        May 2016
+* @brief       The ArchC RISC-V functional model
+*
+*
+*/
+
+
 AC_ARCH(riscv) {
 
   ac_mem DM:512M;
   ac_regbank RB:32;
 
   ac_regbank RBF:32;
-  ac_reg fcsr; //to be decided
+  ac_reg fcsr; 
 
   ac_wordsize 32;
 

@@ -4,7 +4,7 @@
 * @version     1.0
 * 
 *
-* @date        21 June 2016
+* @date        May 2016
 * @brief       The ArchC RISC-V functional model
 *
 * @Source      http://people.eecs.berkeley.edu/~krste/papers/riscv-spec-2.0.pdf
@@ -757,17 +757,20 @@ void ac_behavior(REMU) {
 }
 
 
+// Instruction LR.W behavior method
 void ac_behavior(LR_W){
   RB[rd] = DM.read(RB[rs1]);
 }
 
 
+// Instruction SC.w behavior method
 void ac_behavior(SC_W){
   DM.write(RB[rs1], RB[rs2]);
   RB[rd] = 0; //indicating success
 }
 
 
+// Instruction AMOSWAP.W behavior method
 void ac_behavior (AMOSWAP_W){
   dbg_printf("AMOSWAP.W r%d, r%d, r%d\n", rd, rs1, rs2);
   RB[rd] = DM.read(RB[rs1]);
@@ -782,6 +785,7 @@ void ac_behavior (AMOSWAP_W){
 }
 
 
+// Instruction AMOADD.W behavior method
 void ac_behavior (AMOADD_W){
   dbg_printf("AMOADD.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -792,6 +796,7 @@ void ac_behavior (AMOADD_W){
 }
 
 
+// Instruction AMOXOR.W behavior method
 void ac_behavior (AMOXOR_W){
   dbg_printf("AMOXOR.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -802,6 +807,7 @@ void ac_behavior (AMOXOR_W){
 }
 
 
+// Instruction AMOAND.W behavior method
 void ac_behavior (AMOAND_W){
   dbg_printf("AMOAND.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -812,6 +818,7 @@ void ac_behavior (AMOAND_W){
 }
 
 
+// Instruction AMOOR.W behavior method
 void ac_behavior (AMOOR_W){
   dbg_printf("AMOOR.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -822,6 +829,7 @@ void ac_behavior (AMOOR_W){
 }
 
 
+// Instruction AMOMIN.W behavior method
 void ac_behavior (AMOMIN_W){
   dbg_printf("AMOMIN.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -834,6 +842,7 @@ void ac_behavior (AMOMIN_W){
 }
 
 
+// Instruction AMOMAX.W behavior method
 void ac_behavior (AMOMAX_W){
   dbg_printf("AMOMAX.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -846,6 +855,7 @@ void ac_behavior (AMOMAX_W){
 }
 
 
+// Instruction AMOMINU.W behavior method
 void ac_behavior (AMOMINU_W){
   dbg_printf("AMOMINU.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -858,6 +868,7 @@ void ac_behavior (AMOMINU_W){
 }
 
 
+// Instruction AMOMAXU.W behavior method
 void ac_behavior (AMOMAXU_W){
   dbg_printf("AMOMAXU.W r%d, r%d, r%d\n", rd, rs1, rs2); 
   RB[rd] = DM.read(RB[rs1]);
@@ -869,6 +880,8 @@ void ac_behavior (AMOMAXU_W){
     DM.write(RB[rs1], RB[rs2]);
 }
 
+
+// Instruction FLW behavior method
 void ac_behavior(FLW){
   int offset;
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
@@ -881,6 +894,8 @@ void ac_behavior(FLW){
   dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
 }
 
+
+// Instruction FSW behavior method
 void ac_behavior(FSW){
   int imm;
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
@@ -892,6 +907,7 @@ void ac_behavior(FSW){
 }
 
 
+// Instruction FADD.S behavior method
 void ac_behavior(FADD_S){
   dbg_printf("FADD.S r%d, r%d, r%d\n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -903,6 +919,7 @@ void ac_behavior(FADD_S){
 }
 
 
+// Instruction FSUB.S behavior method
 void ac_behavior(FSUB_S){
   dbg_printf("FSUB.S r%d, r%d, r%d\n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -914,6 +931,7 @@ void ac_behavior(FSUB_S){
 }
 
 
+// Instruction FMUL.S behavior method
 void ac_behavior(FMUL_S){
   dbg_printf("FMUL.S r%d, r%d, r%d\n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -925,6 +943,7 @@ void ac_behavior(FMUL_S){
 } 
 
 
+// Instruction FDIV.S behavior method
 void ac_behavior(FDIV_S){
   dbg_printf("FDIV.S r%d, r%d, r%d\n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -936,6 +955,7 @@ void ac_behavior(FDIV_S){
 }
 
 
+// Instruction FMIN.S behavior method
 void ac_behavior(FMIN_S){
   dbg_printf("FMIN.S r%d, r%d, r%d\n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -953,6 +973,7 @@ void ac_behavior(FMIN_S){
 }
 
 
+// Instruction FMAX.S behavior method
 void ac_behavior(FMAX_S){
   dbg_printf("FMAX.S r%d, r%d, r%d\n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -970,6 +991,7 @@ void ac_behavior(FMAX_S){
 }
 
 
+// Instruction FSQRT.S behavior method
 void ac_behavior(FSQRT_S){
   dbg_printf("FSQRT.S r%d, r%d\n", rd, rs1);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -985,6 +1007,7 @@ void ac_behavior(FSQRT_S){
 }
 
 
+// Instruction FMADD.S behavior method
 void ac_behavior(FMADD_S){
   dbg_printf("FMADD.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -997,6 +1020,7 @@ void ac_behavior(FMADD_S){
 }
 
 
+// Instruction FMSUB.S behavior method
 void ac_behavior(FMSUB_S){
   dbg_printf("FMSUB.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -1009,6 +1033,7 @@ void ac_behavior(FMSUB_S){
 }
 
 
+// Instruction FNMSUB.S behavior method
 void ac_behavior(FNMSUB_S){
   dbg_printf("FNMSUB.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -1021,6 +1046,7 @@ void ac_behavior(FNMSUB_S){
 }
 
 
+// Instruction FNMADD.S behavior method
 void ac_behavior(FNMADD_S){
   dbg_printf("FNMADD.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
   dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
@@ -1395,6 +1421,7 @@ void ac_behavior(FCVT_D_S){
 }
 
 
+// Instruction FMV.D behavior method
 void ac_behavior(FMV_D){
   dbg_printf("FMV.D r%d, r%d", rd, rs1);
   double temp;
