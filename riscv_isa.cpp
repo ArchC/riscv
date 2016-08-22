@@ -17,7 +17,7 @@
 #include "math.h"
 
 // Uncomment for debug Information
-//#define DEBUG_MODEL
+  #define DEBUG_MODEL
 #include "ac_debug_model.H"
 
 #define Ra 1
@@ -1069,6 +1069,24 @@ void ac_behavior(FCVT_S_WU){
   float temp;
   temp = (float) RB[rs1];
   save_float(temp, rd);
+}
+
+
+// Instruction FMV_X_S behavior method
+void ac_behavior(FMV_X_S){
+  dbg_printf("FMV.X.S r%d, r%d", rd, rs1);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  RB[rd] = (int)load_float(rs1);
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FMV_S_X behavior method
+void ac_behavior(FMV_S_X){
+  dbg_printf("FMV.S.X r%d, r%d", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  save_float(RB[rs1], rd);
+  dbg_printf("RBF[rd] = %f \n \n", load_float(rd));
 }
 
 
