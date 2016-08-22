@@ -1,7 +1,6 @@
 /**
  * @file      riscv_isa_helper.H
- * @author    Pavani Tripathi
- *            
+ *             
  *
  * @version   1.0
  * @date      August 2016
@@ -45,4 +44,8 @@ inline float load_float(uint32_t index) {
 
 inline void save_float(float input, uint32_t index) {
   memcpy(&RBF[index], &input, sizeof(uint32_t));
+}
+
+static bool custom_isnan(double var) {
+  return var != var;
 }
