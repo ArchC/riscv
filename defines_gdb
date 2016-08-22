@@ -1,5 +1,5 @@
 //Number of registers
-#define NUM_REGISTERS 32
+#define NUM_REGISTERS 33
 
 //Number stack pointer register
 #define NUM_REGISTER_SP 2
