@@ -16,7 +16,7 @@
 #include "riscv_bhv_macros.H"
 
 // Uncomment for debug Information
-  #define DEBUG_MODEL
+//#define DEBUG_MODEL
 #include "ac_debug_model.H"
 
 #define Ra 1
@@ -1154,26 +1154,32 @@ void ac_behavior(FMV_S){
 
 // Instruction FLD behavior method
 void ac_behavior(FLD){
-  int imm;
-  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
-  dbg_printf("FLD r%d, r%d, %d\n", rd, rs1, imm);
-  int sign_ext;
-  sign_ext = sign_extend(imm, 12);
-  RBF[rd] = DM.read(RB[rs1] + sign_ext);  
-  dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
-  dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+ int imm;
+ imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+ dbg_printf("FLD r%d, r%d, %d\n", rd, rs1, imm);
+ int sign_ext;
+ sign_ext = sign_extend(imm, 12);
+ RBF[rd*2] = DM.read(RB[rs1] + sign_ext);
+ RBF[rd*2+1] = DM.read(RB[rs1] + sign_ext + 4);  
+ dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
+ dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
+ double temp = load_double(rd);
+ // dbg_printf("Result = %.3f\n\n", temp);
+dbg_printf("Double: %lf", temp);
+dbg_printf("Hex: %08X %08X", *(unsigned *)(&temp), *((unsigned *)(&temp) + 4)); // Don't know if this works, it's just a hack
 }
 
 
+// Instruction FSD behavior method
 void ac_behavior(FSD){
-  int imm;
-  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
-  dbg_printf("FSD r%d, r%d, %d\n", rs1, rs2, imm);
-  int sign_ext;
-  sign_ext = sign_extend(imm, 12);
-  DM.write(RB[rs1] + sign_ext, RBF[rs2]);
-  dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
+ int imm;
+ imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+ dbg_printf("FSD r%d, r%d, %d\n", rs1, rs2, imm);
+ int sign_ext;
+ sign_ext = sign_extend(imm, 12);
+ DM.write(RB[rs1] + sign_ext, RBF[rs2*2]);
+ DM.write(RB[rs1] + sign_ext + 4, RBF[rs2*2 + 1]);
+ dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);        
 }
 
 

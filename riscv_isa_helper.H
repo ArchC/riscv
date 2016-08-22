@@ -24,7 +24,7 @@
 
  inline double load_double(uint32_t index) {
   double res;
-  uint64_t input = ((uint64_t)RBF[index]) + (((uint64_t)RBF[index + 1]) << 32);
+  uint64_t input = ((uint64_t)RBF[index*2]) + (((uint64_t)RBF[index*2 + 1]) << 32);
   memcpy(&res, &input, sizeof(input));
   return res;
 }
@@ -32,8 +32,8 @@
 inline void save_double(double input, uint32_t index) {
   uint64_t temp;
   memcpy(&temp, &input, sizeof(temp));
-  RBF[index] = temp & 0xFFFFFFFF;
-  RBF[index + 1] = temp >> 32;
+  RBF[index*2] = temp & 0xFFFFFFFF;
+  RBF[index*2 + 1] = temp >> 32;
 }
 
 inline float load_float(uint32_t index) {
