@@ -1387,3 +1387,57 @@ void ac_behavior(FMV_D){
   temp = load_float(rs1);
   save_float(temp, rd);
 }
+
+
+// Instruction FEQ_D behavior method
+void ac_behavior(FEQ_D){
+  dbg_printf("FEQ.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_double(rs2));
+  if((isnan(load_double(rs1)) == 1) || (isnan(load_double(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_double(rs1) == load_double(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLE_D behavior method
+void ac_behavior(FLE_D){
+  dbg_printf("FLE.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_double(rs2));
+  if((isnan(load_double(rs1)) == 1) || (isnan(load_double(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_double(rs1) <= load_double(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLT_D behavior method
+void ac_behavior(FLT_D){
+  dbg_printf("FLT.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_double(rs2));
+  if((isnan(load_double(rs1)) == 1) || (isnan(load_double(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_double(rs1) < load_double(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
