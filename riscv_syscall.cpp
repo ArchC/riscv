@@ -86,7 +86,7 @@ void riscv_syscall::set_prog_args(int argc, char **argv)
   RB[10] = argc;
 
   //Set %o1 to the string pointers
-  RB[10] = base - 120;
+  RB[11] = base - 120;
 
   procNumber ++;
 }
