@@ -1326,4 +1326,10 @@ void ac_behavior(FCVT_D_S){
   save_double(temp, rd);
 }
 
->>>>>>> ded2bde... Added FP and Double-FP conversion instructions
+
+void ac_behavior(FMV_D){
+  dbg_printf("FMV.D r%d, r%d", rd, rs1);
+  float temp;
+  temp = load_float(rs1);
+  save_float(temp, rd);
+}

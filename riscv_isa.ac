@@ -63,7 +63,8 @@ AC_ISA(riscv){
   ac_instr<Type_R> FADD_D, FSUB_D, FMUL_D, FDIV_D, FMIN_D, FMAX_D, FSQRT_D;
   ac_instr<Type_R4> FMADD_D, FMSUB_D, FNMSUB_D, FNMADD_D;
   ac_instr<Type_R> FCVT_S_D, FCVT_D_S, FCVT_W_D, FCVT_WU_D, FCVT_D_W, FCVT_D_WU;
-
+  ac_instr<Type_R> FMV_D;
+  
   //RISC-V specific register names
   ac_asm_map reg{
   "$"[0..31] = [0..31];
@@ -404,5 +405,8 @@ ISA_CTOR(riscv){
 
   FCVT_D_WU.set_asm("FCVT.D.WU %reg, %reg", rd, rs1);
   FCVT_D_WU.set_decoder(funct7 = 0x69, rs2 = 1, op = 0x53);
+
+  FMV_D.set_asm("FMV.D %reg, %reg", rd, rs1);
+  FMV_D.set_decoder(funct7 = 0x11, op = 0x53);
   };
 };
