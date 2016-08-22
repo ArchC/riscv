@@ -1,0 +1,20 @@
+//Number of registers
+#define NUM_REGISTERS 32
+
+//Number stack pointer register
+#define NUM_REGISTER_SP 2
+
+//Number frame pointer register
+#define NUM_REGISTER_FP 8
+
+//Number program counter register
+#define NUM_REGISTER_PC 32
+
+//Number first return procedures register
+#define NUM_REGISTER_RET1 1
+
+//Number second return procedures register - only SPARC
+#define NUM_REGISTER_RET2 -1
+
+//Offset add in pc register - only SPARC
+#define OFFSET 0

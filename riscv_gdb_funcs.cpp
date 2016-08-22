@@ -14,20 +14,24 @@ using namespace riscv_parms;
 
 int riscv::nRegs(void) { return 33; }
 
-ac_word riscv::reg_read() {
+ac_word riscv::reg_read(int reg) {
   if ((reg >= 0) && (reg < 32))
     return RB.read(reg);
   else if (reg == 32)
     return ac_pc;
 }
 
-ac_word riscv::reg_write() {
+void riscv::reg_write(int reg, ac_word value) {
   if ((reg >= 0) && (reg < 32))
     RB.write(reg, value);
   else if (reg == 32)
     ac_pc = value;
 }
 
-unsigned char riscv::mem_read() { return IM->read_byte(address); }
+unsigned char riscv::mem_read(unsigned int address) {
+  return DATA_PORT->read_byte(address);
+}
 
-void riscv::mem_write() { IM->write_byte(adress, byte); }
+void riscv::mem_write(unsigned int address, unsigned char byte) {
+  DATA_PORT->write_byte(address, byte);
+}
