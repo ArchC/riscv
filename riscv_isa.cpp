@@ -14,7 +14,6 @@
 #include "riscv_isa.H"
 #include "riscv_isa_init.cpp"
 #include "riscv_bhv_macros.H"
-#include "math.h"
 
 // Uncomment for debug Information
   #define DEBUG_MODEL
