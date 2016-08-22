@@ -54,13 +54,14 @@ AC_ISA(riscv){
   ac_instr<Type_S> FSW;
   ac_instr<Type_R> FADD_S, FSUB_S, FMUL_S, FDIV_S, FMIN_S, FMAX_S, FSQRT_S;
   ac_instr<Type_R4> FMADD_S, FMSUB_S, FNMSUB_S, FNMADD_S;
+  ac_instr<Type_R> FCVT_W_S, FCVT_WU_S, FCVT_S_WU, FCVT_S_W; 
 
   //RV32D
   ac_instr<Type_I> FLD;
   ac_instr<Type_S> FSD;
   ac_instr<Type_R> FADD_D, FSUB_D, FMUL_D, FDIV_D, FMIN_D, FMAX_D, FSQRT_D;
   ac_instr<Type_R4> FMADD_D, FMSUB_D, FNMSUB_D, FNMADD_D;
-
+  ac_instr<Type_R> FCVT_S_D, FCVT_D_S, FCVT_W_D, FCVT_WU_D, FCVT_D_W, FCVT_D_WU;
 
   //RISC-V specific register names
   ac_asm_map reg{
@@ -224,8 +225,6 @@ ISA_CTOR(riscv){
   RDINSTRETH.set_asm("RDINSTRETH %reg", rd);
   RDINSTRETH.set_decoder(imm4 = 1, imm3 = 36, imm2 = 1, imm1 = 0, rs1 = 0x00, funct3 = 0x2, op = 0x73);
 
-  //optional properties to optimize compiled simulation
-
   //RV32M
 
   MUL.set_asm("MUL %reg %reg %reg", rd, rs1, rs2);
@@ -329,6 +328,18 @@ ISA_CTOR(riscv){
   FMADD_S.set_asm("FMADD.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
   FMADD_S.set_decoder(funct2 = 0, op = 0x43);
 
+  FCVT_W_S.set_asm("FCVT.W.S %reg, %reg", rd, rs1);
+  FCVT_W_S.set_decoder(funct7 = 0x60, rs2 = 0, op = 0x53);
+
+  FCVT_WU_S.set_asm("FCVT.WU.S %reg, %reg", rd, rs1);
+  FCVT_WU_S.set_decoder(funct7 = 0x60, rs2 = 1, op = 0x53);
+
+  FCVT_S_W.set_asm("FCVT.S.W %reg, %reg", rd, rs1);
+  FCVT_S_W.set_decoder(funct7 = 0x68, rs2 = 0, op = 0x53);
+
+  FCVT_S_WU.set_asm("FCVT.S.X %reg, %reg", rd, rs1);
+  FCVT_S_WU.set_decoder(funct7 = 0x68, rs2 = 1, op = 0x53);
+
   //RV32D
   FLD.set_asm("FLD %reg, %reg, %imm", rd, rs1, imm4+imm3+imm2+imm1);
   FLD.set_decoder(funct3 = 0x3, op=0x07);
@@ -368,5 +379,23 @@ ISA_CTOR(riscv){
 
   FNMADD_D.set_asm("FNMADD.D %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
   FNMADD_D.set_decoder(funct2 = 1, op = 0x4F);
+
+  FCVT_S_D.set_asm("FCVT.S.D %reg, %reg", rd, rs1);
+  FCVT_S_D.set_decoder(funct7 = 0x20, rs2 = 1, op = 0x53);
+
+  FCVT_D_S.set_asm("FCVT.D.S %reg, %reg", rd, rs1);
+  FCVT_D_S.set_decoder(funct7 = 0x20, rs2 = 0, op = 0x53);
+
+  FCVT_W_D.set_asm("FCVT.W.D %reg, %reg", rd, rs1);
+  FCVT_W_D.set_decoder(funct7 = 0x61, rs2 = 0, op = 0x53);
+
+  FCVT_WU_D.set_asm("FCVT.WU.D %reg, %reg", rd, rs1);
+  FCVT_WU_D.set_decoder(funct7 = 0x61, rs2 = 1, op = 0x53);
+
+  FCVT_D_W.set_asm("FCVT.D.W %reg, %reg", rd, rs1);
+  FCVT_D_W.set_decoder(funct7 = 0x69, rs2 = 0, op = 0x53);
+
+  FCVT_D_WU.set_asm("FCVT.D.WU %reg, %reg", rd, rs1);
+  FCVT_D_WU.set_decoder(funct7 = 0x69, rs2 = 1, op = 0x53);
   };
 };

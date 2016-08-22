@@ -17,7 +17,7 @@
 #include "math.h"
 
 // Uncomment for debug Information
-#define DEBUG_MODEL
+//#define DEBUG_MODEL
 #include "ac_debug_model.H"
 
 #define Ra 1
@@ -1034,6 +1034,45 @@ void ac_behavior(FNMADD_S){
 }
 
 
+// Instruction FCVT.W.S behavior method
+void ac_behavior(FCVT_W_S){
+  dbg_printf("FCVT.W.S r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_float(rs1));
+  RB[rd] = round(load_float(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT.WU.S behavior method
+void ac_behavior(FCVT_WU_S){
+  dbg_printf("FCVT.WU.S r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_float(rs1));
+  RB[rd] = (unsigned int)(load_float(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT.S.W behaior method
+void ac_behavior(FCVT_S_W){
+  dbg_printf("FCVT.S.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float temp;
+  temp = (float) RB[rs1];
+  save_float(temp, rd);
+}
+
+
+// Instruction FCVT_S_WU behaior method
+void ac_behavior(FCVT_S_WU){
+  dbg_printf("FCVT.S.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float temp;
+  temp = (float) RB[rs1];
+  save_float(temp, rd);
+}
+
+
+// Instruction FLD behavior method
 void ac_behavior(FLD){
   int imm;
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
@@ -1210,4 +1249,63 @@ void ac_behavior(FNMADD_D){
   save_double(res, rd);
   dbg_printf("Result = %.3f\n\n", res);
 }
->>>>>>> cedd984... Added Double-FP computation Instructions
+
+
+// Instruction FCVT.W.D behavior method
+void ac_behavior(FCVT_W_D){
+  dbg_printf("FCVT.W.D r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_double(rs1));
+  RB[rd] = lround(load_double(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT.WU.D behavior method
+void ac_behavior(FCVT_WU_D){
+  dbg_printf("FCVT.WU.D r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_double(rs1));
+  RB[rd] = (unsigned int)(load_double(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT_D_W behaior method
+void ac_behavior(FCVT_D_W){
+  dbg_printf("FCVT.D.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double temp;
+  temp = (double) RB[rs1];
+  save_float(temp, rd);
+}
+
+
+// Instruction FCVT_D_WU behaior method
+void ac_behavior(FCVT_D_WU){
+  dbg_printf("FCVT.D.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double temp;
+  temp = (double) RB[rs1];
+  save_double(temp, rd);
+}
+
+
+// Instruction FCVT_S_D behavior method
+void ac_behavior(FCVT_S_D){
+  dbg_printf("FCVT.S.D r%d, r%d", rd, rs1);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  double temp;
+  temp = (float)(load_double(rs1));
+  save_float(temp, rd);
+}
+
+
+// Instruction FCVT_D_S behavior method
+void ac_behavior(FCVT_D_S){
+  dbg_printf("FCVT.D.S r%d, r%d", rd, rs1);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  float temp;
+  temp = (double)(load_float(rs1));
+  save_double(temp, rd);
+}
+
+>>>>>>> ded2bde... Added FP and Double-FP conversion instructions
