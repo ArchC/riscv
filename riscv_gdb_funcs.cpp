@@ -2,7 +2,7 @@
 *
 * @file        riscv_isa.cpp
 * @version     1.0
-* 
+*
 *
 * @date        May 2016
 * @brief       The ArchC RISC-V functional model
