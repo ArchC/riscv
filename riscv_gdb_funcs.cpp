@@ -1,10 +1,12 @@
 /*
-* @file		riscv_gdb_funcs.cpp
-* @version	1.0
 *
+* @file        riscv_isa.cpp
+* @version     1.0
+* 
 *
-* @date
-* @brief 	The ArchC RISC-V functional model
+* @date        May 2016
+* @brief       The ArchC RISC-V functional model
+*
 *
 */
 

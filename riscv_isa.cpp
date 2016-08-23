@@ -4,7 +4,7 @@
 * @version     1.0
 * 
 *
-* @date        21 June 2016
+* @date        May 2016
 * @brief       The ArchC RISC-V functional model
 *
 * @Source      http://people.eecs.berkeley.edu/~krste/papers/riscv-spec-2.0.pdf
@@ -14,10 +14,9 @@
 #include "riscv_isa.H"
 #include "riscv_isa_init.cpp"
 #include "riscv_bhv_macros.H"
-#include "math.h"
 
 // Uncomment for debug Information
-#define DEBUG_MODEL
+//#define DEBUG_MODEL
 #include "ac_debug_model.H"
 
 #define Ra 1
@@ -55,6 +54,7 @@ void ac_behavior(begin) {
     {
       RB[regNum] = 0;
       RBF[regNum] = 0;
+      RBF[regNum+32] = 0;
     }
   fcsr = 0;
 }
@@ -757,17 +757,20 @@ void ac_behavior(REMU) {
 }
 
 
+// Instruction LR.W behavior method
 void ac_behavior(LR_W){
   RB[rd] = DM.read(RB[rs1]);
 }
 
 
+// Instruction SC.w behavior method
 void ac_behavior(SC_W){
   DM.write(RB[rs1], RB[rs2]);
   RB[rd] = 0; //indicating success
 }
 
 
+// Instruction AMOSWAP.W behavior method
 void ac_behavior (AMOSWAP_W){
   dbg_printf("AMOSWAP.W r%d, r%d, r%d\n", rd, rs1, rs2);
   RB[rd] = DM.read(RB[rs1]);
@@ -782,6 +785,7 @@ void ac_behavior (AMOSWAP_W){
 }
 
 
+// Instruction AMOADD.W behavior method
 void ac_behavior (AMOADD_W){
   dbg_printf("AMOADD.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -792,6 +796,7 @@ void ac_behavior (AMOADD_W){
 }
 
 
+// Instruction AMOXOR.W behavior method
 void ac_behavior (AMOXOR_W){
   dbg_printf("AMOXOR.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -802,6 +807,7 @@ void ac_behavior (AMOXOR_W){
 }
 
 
+// Instruction AMOAND.W behavior method
 void ac_behavior (AMOAND_W){
   dbg_printf("AMOAND.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -812,6 +818,7 @@ void ac_behavior (AMOAND_W){
 }
 
 
+// Instruction AMOOR.W behavior method
 void ac_behavior (AMOOR_W){
   dbg_printf("AMOOR.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -822,6 +829,7 @@ void ac_behavior (AMOOR_W){
 }
 
 
+// Instruction AMOMIN.W behavior method
 void ac_behavior (AMOMIN_W){
   dbg_printf("AMOMIN.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -834,6 +842,7 @@ void ac_behavior (AMOMIN_W){
 }
 
 
+// Instruction AMOMAX.W behavior method
 void ac_behavior (AMOMAX_W){
   dbg_printf("AMOMAX.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -846,6 +855,7 @@ void ac_behavior (AMOMAX_W){
 }
 
 
+// Instruction AMOMINU.W behavior method
 void ac_behavior (AMOMINU_W){
   dbg_printf("AMOMINU.W r%d, r%d, r%d\n", rd, rs1, rs2);  
   RB[rd] = DM.read(RB[rs1]);
@@ -858,6 +868,7 @@ void ac_behavior (AMOMINU_W){
 }
 
 
+// Instruction AMOMAXU.W behavior method
 void ac_behavior (AMOMAXU_W){
   dbg_printf("AMOMAXU.W r%d, r%d, r%d\n", rd, rs1, rs2); 
   RB[rd] = DM.read(RB[rs1]);
@@ -869,6 +880,8 @@ void ac_behavior (AMOMAXU_W){
     DM.write(RB[rs1], RB[rs2]);
 }
 
+
+// Instruction FLW behavior method
 void ac_behavior(FLW){
   int offset;
   offset = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
@@ -881,6 +894,8 @@ void ac_behavior(FLW){
   dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
 }
 
+
+// Instruction FSW behavior method
 void ac_behavior(FSW){
   int imm;
   imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
@@ -892,70 +907,96 @@ void ac_behavior(FSW){
 }
 
 
+// Instruction FADD.S behavior method
 void ac_behavior(FADD_S){
   dbg_printf("FADD.S r%d, r%d, r%d\n", rd, rs1, rs2);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  RBF[rd] = RBF[rs1] + RBF[rs2];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  float sum;
+  sum = load_float(rs1) + load_float(rs2);
+  save_float(sum, rd);
+  dbg_printf("Result = %.3f\n\n", sum);
 }
 
 
+// Instruction FSUB.S behavior method
 void ac_behavior(FSUB_S){
   dbg_printf("FSUB.S r%d, r%d, r%d\n", rd, rs1, rs2);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  RBF[rd] = RBF[rs1] - RBF[rs2];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  float diff;
+  diff = load_float(rs1) - load_float(rs2);
+  save_float(diff, rd);
+  dbg_printf("Result = %.3f\n\n", diff);
 }
 
 
+// Instruction FMUL.S behavior method
 void ac_behavior(FMUL_S){
   dbg_printf("FMUL.S r%d, r%d, r%d\n", rd, rs1, rs2);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  RBF[rd] = RBF[rs1] * RBF[rs2];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  float product;
+  product = load_float(rs1) * load_float(rs2);
+  save_float(product, rd);
+  dbg_printf("Result = %.3f\n\n", product);
 } 
 
 
+// Instruction FDIV.S behavior method
 void ac_behavior(FDIV_S){
   dbg_printf("FDIV.S r%d, r%d, r%d\n", rd, rs1, rs2);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  RBF[rd] = RBF[rs1]/RBF[rs2];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);  
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  float quot;
+  quot = load_float(rs1)/load_float(rs2);
+  save_float(quot, rd);
+  dbg_printf("Result = %.3f\n\n", quot);  
 }
 
 
+// Instruction FMIN.S behavior method
 void ac_behavior(FMIN_S){
   dbg_printf("FMIN.S r%d, r%d, r%d\n", rd, rs1, rs2);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  if(RBF[rs1] < RBF[rs2])
-    RBF[rd] = RBF[rs1];
-  else
-    RBF[rd] = RBF[rs2];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);   
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  float temp;
+  if(load_float(rs1) < load_float(rs2)){
+  	temp = load_float(rs1);
+  	save_float(temp, rd);
+  }
+  else{
+    temp = load_float(rs2);
+  	save_float(temp, rd);
+  }
+  dbg_printf("Result = %.3f\n\n", temp);   
 }
 
 
+// Instruction FMAX.S behavior method
 void ac_behavior(FMAX_S){
   dbg_printf("FMAX.S r%d, r%d, r%d\n", rd, rs1, rs2);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  if(RBF[rs1] > RBF[rs2])
-    RBF[rd] = RBF[rs1];
-  else
-    RBF[rd] = RBF[rs2];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);   
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  float temp;
+  if(load_float(rs1) > load_float(rs2)){
+  	temp = load_float(rs1);
+  	save_float(temp, rd);
+  }
+  else{
+    temp = load_float(rs2);
+  	save_float(temp, rd);
+  }
+  dbg_printf("Result = %.3f\n\n", temp);   
 }
 
 
+// Instruction FSQRT.S behavior method
 void ac_behavior(FSQRT_S){
   dbg_printf("FSQRT.S r%d, r%d\n", rd, rs1);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  if(RBF[rs1] < 0)
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  float temp;
+  if(load_float(rs1) < 0)
     {
        dbg_printf("Invalid!");
        stop();
@@ -966,65 +1007,478 @@ void ac_behavior(FSQRT_S){
 }
 
 
+// Instruction FMADD.S behavior method
 void ac_behavior(FMADD_S){
   dbg_printf("FMADD.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
-  RBF[rd] = RBF[rs1]*RBF[rs2]+RBF[rs3];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs3));
+  float res;
+  res = load_float(rs1)*load_float(rs2)+load_float(rs3);
+  save_float(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
 }
 
 
+// Instruction FMSUB.S behavior method
 void ac_behavior(FMSUB_S){
   dbg_printf("FMSUB.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
-  RBF[rd] = RBF[rs1]*RBF[rs2]-RBF[rs3];
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs3));
+  float res;
+  res = load_float(rs1)*load_float(rs2)-load_float(rs3);
+  save_float(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
 }
 
 
+// Instruction FNMSUB.S behavior method
 void ac_behavior(FNMSUB_S){
   dbg_printf("FNMSUB.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
-  RBF[rd] = (-(RBF[rs1]*RBF[rs2]-RBF[rs3]));
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs3));
+  float res;
+  res = (-(load_float(rs1)*load_float(rs2)-load_float(rs3)));
+  save_float(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
 }
 
 
+// Instruction FNMADD.S behavior method
 void ac_behavior(FNMADD_S){
   dbg_printf("FNMADD.S r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
-  dbg_printf("RBF[rs1] = %.3f\n", (float)RBF[rs1]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs2]);
-  dbg_printf("RBF[rs2] = %.3f\n", (float)RBF[rs3]);
-  RBF[rd] = (-(RBF[rs1]*RBF[rs2]+RBF[rs3]));
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+  dbg_printf("RBF[rs1] = %.3f\n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_float(rs3));
+  float res;
+  res = (-(load_float(rs1)*load_float(rs2)+load_float(rs3)));
+  save_float(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
 }
 
 
+// Instruction FCVT.W.S behavior method
+void ac_behavior(FCVT_W_S){
+  dbg_printf("FCVT.W.S r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_float(rs1));
+  RB[rd] = round(load_float(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT.WU.S behavior method
+void ac_behavior(FCVT_WU_S){
+  dbg_printf("FCVT.WU.S r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_float(rs1));
+  RB[rd] = (unsigned int)(load_float(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT.S.W behaior method
+void ac_behavior(FCVT_S_W){
+  dbg_printf("FCVT.S.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float temp;
+  temp = (float) RB[rs1];
+  save_float(temp, rd);
+}
+
+
+// Instruction FCVT_S_WU behaior method
+void ac_behavior(FCVT_S_WU){
+  dbg_printf("FCVT.S.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float temp;
+  temp = (float) RB[rs1];
+  save_float(temp, rd);
+}
+
+
+// Instruction FMV_X_S behavior method
+void ac_behavior(FMV_X_S){
+  dbg_printf("FMV.X.S r%d, r%d \n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  RB[rd] = (int)load_float(rs1);
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FMV_S_X behavior method
+void ac_behavior(FMV_S_X){
+  dbg_printf("FMV.S.X r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  save_float(RB[rs1], rd);
+  dbg_printf("RBF[rd] = %f \n \n", load_float(rd));
+}
+
+
+// Instruction FEQ_S behavior method
+void ac_behavior(FEQ_S){
+  dbg_printf("FEQ.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
+  if((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_float(rs1) == load_float(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLE_S behavior method
+void ac_behavior(FLE_S){
+  dbg_printf("FLE.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
+  if((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_float(rs1) <= load_float(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLT_S behavior method
+void ac_behavior(FLT_S){
+  dbg_printf("FLT.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
+  if((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_float(rs1) < load_float(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FMV.S behavior method
+void ac_behavior(FMV_S){
+  dbg_printf("FMV.S r%d, r%d", rd, rs1);
+  float temp;
+  temp = load_float(rs1);
+  save_float(temp, rd);
+}
+
+
+// Instruction FLD behavior method
 void ac_behavior(FLD){
-  int imm;
-  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
-  dbg_printf("FLD r%d, r%d, %d\n", rd, rs1, imm);
-  int sign_ext;
-  sign_ext = sign_extend(imm, 12);
-  RBF[rd] = DM.read(RB[rs1] + sign_ext);  
-  dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
-  dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
-  dbg_printf("Result = %.3f\n\n", (float)RBF[rd]);
+ int imm;
+ imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+ dbg_printf("FLD r%d, r%d, %d\n", rd, rs1, imm);
+ int sign_ext;
+ sign_ext = sign_extend(imm, 12);
+ RBF[rd*2] = DM.read(RB[rs1] + sign_ext);
+ RBF[rd*2+1] = DM.read(RB[rs1] + sign_ext + 4);  
+ dbg_printf("RB[rs1] = %#x\n", RB[rs1]);
+ dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
+ double temp = load_double(rd);
+ // dbg_printf("Result = %.3f\n\n", temp);
+dbg_printf("Double: %lf", temp);
+dbg_printf("Hex: %08X %08X", *(unsigned *)(&temp), *((unsigned *)(&temp) + 4)); // Don't know if this works, it's just a hack
 }
 
 
+// Instruction FSD behavior method
 void ac_behavior(FSD){
-  int imm;
-  imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
-  dbg_printf("FSD r%d, r%d, %d\n", rs1, rs2, imm);
-  int sign_ext;
-  sign_ext = sign_extend(imm, 12);
-  DM.write(RB[rs1] + sign_ext, RBF[rs2]);
-  dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);		
+ int imm;
+ imm = (imm4 << 11) | (imm3 << 5) | (imm2 << 1) | imm1;
+ dbg_printf("FSD r%d, r%d, %d\n", rs1, rs2, imm);
+ int sign_ext;
+ sign_ext = sign_extend(imm, 12);
+ DM.write(RB[rs1] + sign_ext, RBF[rs2*2]);
+ DM.write(RB[rs1] + sign_ext + 4, RBF[rs2*2 + 1]);
+ dbg_printf("addr: %d\n\n", RB[rs1]+sign_ext);        
+}
+
+
+// Instruction FADD.D behavior method
+void ac_behavior(FADD_D){
+  dbg_printf("FADD.D r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  double sum;
+  sum = load_double(rs1) + load_double(rs2);
+  save_double(sum, rd);
+  dbg_printf("Result = %.3f\n\n", sum);
+}
+
+
+// Instruction FSUB.D behavior method
+void ac_behavior(FSUB_D){
+  dbg_printf("FSUB.D r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  double diff;
+  diff = load_double(rs1) - load_double(rs2);
+  save_double(diff, rd);
+  dbg_printf("Result = %.3f\n\n", diff);
+}
+
+
+// Instruction FMUL.D behavior method
+void ac_behavior(FMUL_D){
+  dbg_printf("FMUL.D r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  double product;
+  product = load_double(rs1) * load_double(rs2);
+  save_double(product, rd);
+  dbg_printf("Result = %.3f\n\n", product);
+} 
+
+
+// Instruction FDIV.D behavior method
+void ac_behavior(FDIV_D){
+  dbg_printf("FDIV.D r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  double quot;
+  quot = load_double(rs1)/load_double(rs2);
+  save_double(quot, rd);
+  dbg_printf("Result = %.3f\n\n", quot);  
+}
+
+
+// Instruction FMIN.D behavior method
+void ac_behavior(FMIN_D){
+  dbg_printf("FMIN.S r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  double temp;
+  if(load_double(rs1) < load_double(rs2)){
+  	temp = load_double(rs1);
+  	save_double(temp, rd);
+  }
+  else{
+    temp = load_double(rs2);
+  	save_double(temp, rd);
+  }
+  dbg_printf("Result = %.3f\n\n", temp);   
+}
+
+
+// Instruction FMAX.D behavior method
+void ac_behavior(FMAX_D){
+  dbg_printf("FMAX.D r%d, r%d, r%d\n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  double temp;
+  if(load_double(rs1) > load_double(rs2)){
+  	temp = load_double(rs1);
+  	save_double(temp, rd);
+  }
+  else{
+    temp = load_double(rs2);
+  	save_double(temp, rd);
+  }
+  dbg_printf("Result = %.3f\n\n", temp);   
+}
+
+
+// Instruction FSQRT.D behavior method
+void ac_behavior(FSQRT_D){
+  dbg_printf("FSQRT.D r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  double temp;
+  if(load_double(rs1) < 0)
+    {
+       dbg_printf("Invalid!");
+       stop();
+    }
+  else{
+  	temp = sqrt(load_double(rs1));
+  	save_double(temp, rd);
+  }
+  dbg_printf("Result = %.3f\n\n", temp);   
+}
+
+
+// Instruction FMADD.D behavior method
+void ac_behavior(FMADD_D){
+  dbg_printf("FMADD.D r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs3));
+  double res;
+  res = load_double(rs1)*load_double(rs2)+load_double(rs3);
+  save_double(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
+}
+
+
+// Instruction FMSUB.D behavior method
+void ac_behavior(FMSUB_D){
+  dbg_printf("FMSUB.D r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs3));
+  double res;
+  res = load_double(rs1)*load_double(rs2)-load_double(rs3);
+  save_double(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
+}
+
+
+// Instruction FNMSUB.D behavior method
+void ac_behavior(FNMSUB_D){
+  dbg_printf("FNMSUB.D r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs3));
+  double res;
+  res = (-(load_double(rs1)*load_double(rs2)-load_double(rs3)));
+  save_double(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
+}
+
+
+// Instruction FNMADD.D behavior method
+void ac_behavior(FNMADD_D){
+  dbg_printf("FNMADD.D r%d, r%d, r%d, r%d\n", rd, rs1, rs2, rs3);
+  dbg_printf("RBF[rs1] = %.3f\n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs2));
+  dbg_printf("RBF[rs2] = %.3f\n", load_double(rs3));
+  double res;
+  res = (-(load_double(rs1)*load_double(rs2)+load_double(rs3)));
+  save_double(res, rd);
+  dbg_printf("Result = %.3f\n\n", res);
+}
+
+
+// Instruction FCVT.W.D behavior method
+void ac_behavior(FCVT_W_D){
+  dbg_printf("FCVT.W.D r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_double(rs1));
+  RB[rd] = lround(load_double(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT.WU.D behavior method
+void ac_behavior(FCVT_WU_D){
+  dbg_printf("FCVT.WU.D r%d, r%d\n", rd, rs1);
+  dbg_printf("RBF[rs1] = %f\n", load_double(rs1));
+  RB[rd] = (unsigned int)(load_double(rs1));
+  dbg_printf("RB[rd] = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FCVT_D_W behaior method
+void ac_behavior(FCVT_D_W){
+  dbg_printf("FCVT.D.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double temp;
+  temp = (double) RB[rs1];
+  save_float(temp, rd);
+}
+
+
+// Instruction FCVT_D_WU behaior method
+void ac_behavior(FCVT_D_WU){
+  dbg_printf("FCVT.D.W r%d, r%d \n", rd, rs1);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double temp;
+  temp = (double) RB[rs1];
+  save_double(temp, rd);
+}
+
+
+// Instruction FCVT_S_D behavior method
+void ac_behavior(FCVT_S_D){
+  dbg_printf("FCVT.S.D r%d, r%d", rd, rs1);
+  dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
+  double temp;
+  temp = (float)(load_double(rs1));
+  save_float(temp, rd);
+}
+
+
+// Instruction FCVT_D_S behavior method
+void ac_behavior(FCVT_D_S){
+  dbg_printf("FCVT.D.S r%d, r%d", rd, rs1);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  float temp;
+  temp = (double)(load_float(rs1));
+  save_double(temp, rd);
+}
+
+
+// Instruction FMV.D behavior method
+void ac_behavior(FMV_D){
+  dbg_printf("FMV.D r%d, r%d", rd, rs1);
+  double temp;
+  temp = load_double(rs1);
+  save_double(temp, rd);
+}
+
+
+// Instruction FEQ_D behavior method
+void ac_behavior(FEQ_D){
+  dbg_printf("FEQ.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_double(rs2));
+  if((custom_isnan(load_double(rs1)) == 1) || (custom_isnan(load_double(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_double(rs1) == load_double(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLE_D behavior method
+void ac_behavior(FLE_D){
+  dbg_printf("FLE.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_double(rs2));
+  if((custom_isnan(load_double(rs1)) == 1) || (custom_isnan(load_double(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_double(rs1) <= load_double(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
+}
+
+
+// Instruction FLT_D behavior method
+void ac_behavior(FLT_D){
+  dbg_printf("FLT.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
+  dbg_printf("RBF[rs2] = %f \n", load_double(rs2));
+  if((custom_isnan(load_double(rs1)) == 1) || (custom_isnan(load_double(rs2)) == 1))
+  {
+    printf("Invalid Operation\n");
+    RB[rd] = 0;
+  }
+  if(load_double(rs1) < load_double(rs2))
+    RB[rd] = 1;
+  else
+    RB[rd] = 0;
+  dbg_printf("Result = %d \n \n", RB[rd]);
 }

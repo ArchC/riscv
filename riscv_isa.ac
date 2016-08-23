@@ -3,7 +3,7 @@
 * @version	1.0
 * @author   Pavani Tripathi
 *
-* @date
+* @date     May 2016
 * @brief 	The ArchC RISC-V functional model
 *
 * @source   http://people.eecs.berkeley.edu/~krste/papers/riscv-spec-2.0.pdf
@@ -54,11 +54,20 @@ AC_ISA(riscv){
   ac_instr<Type_S> FSW;
   ac_instr<Type_R> FADD_S, FSUB_S, FMUL_S, FDIV_S, FMIN_S, FMAX_S, FSQRT_S;
   ac_instr<Type_R4> FMADD_S, FMSUB_S, FNMSUB_S, FNMADD_S;
+  ac_instr<Type_R> FCVT_W_S, FCVT_WU_S, FCVT_S_WU, FCVT_S_W;
+  ac_instr<Type_R> FMV_X_S, FMV_S_X; 
+  ac_instr<Type_R> FEQ_S, FLT_S, FLE_S;
+  ac_instr<Type_R> FMV_S;
 
   //RV32D
   ac_instr<Type_I> FLD;
   ac_instr<Type_S> FSD;
-
+  ac_instr<Type_R> FADD_D, FSUB_D, FMUL_D, FDIV_D, FMIN_D, FMAX_D, FSQRT_D;
+  ac_instr<Type_R4> FMADD_D, FMSUB_D, FNMSUB_D, FNMADD_D;
+  ac_instr<Type_R> FCVT_S_D, FCVT_D_S, FCVT_W_D, FCVT_WU_D, FCVT_D_W, FCVT_D_WU;
+  ac_instr<Type_R> FMV_D;
+  ac_instr<Type_R> FEQ_D, FLT_D, FLE_D;
+  
   //RISC-V specific register names
   ac_asm_map reg{
   "$"[0..31] = [0..31];
@@ -195,8 +204,6 @@ ISA_CTOR(riscv){
   AND.set_asm("AND %reg, %reg, %reg", rd, rs1, rs2);
   AND.set_decoder(funct7 = 0x00, funct3 = 0x7, op = 0x33);
 
-  //FENCE and FENCE.I 
-
   SCALL.set_asm("SCALL");
   SCALL.set_decoder(imm4 = 0, imm3 = 0, imm2 = 0, imm1 = 0, rs1 = 0x00, funct3 = 0x0, rd = 0x00, op = 0x73);
 		
@@ -220,8 +227,6 @@ ISA_CTOR(riscv){
 
   RDINSTRETH.set_asm("RDINSTRETH %reg", rd);
   RDINSTRETH.set_decoder(imm4 = 1, imm3 = 36, imm2 = 1, imm1 = 0, rs1 = 0x00, funct3 = 0x2, op = 0x73);
-
-  //optional properties to optimize compiled simulation
 
   //RV32M
 
@@ -291,45 +296,139 @@ ISA_CTOR(riscv){
   FSW.set_decoder(funct3 = 0x2, op = 0x27);
 
   FADD_S.set_asm("FADD.S %reg, %reg, %reg", rd, rs1, rs2);
-  FADD_S.set_decoder(funct7 = 0x00, funct3 = 0x3, op = 0x53);
+  FADD_S.set_decoder(funct7 = 0x00, op = 0x53);
 
   FSUB_S.set_asm("FSUB.S %reg, %reg, %reg", rd, rs1, rs2);
-  FSUB_S.set_decoder(funct7 = 0x04, funct3 = 0x3, op = 0x53);
+  FSUB_S.set_decoder(funct7 = 0x04, op = 0x53);
 
   FMUL_S.set_asm("FMUL.S %reg, %reg, %reg", rd, rs1, rs2);
-  FMUL_S.set_decoder(funct7 = 0x08, funct3 = 0x3, op = 0x53);
+  FMUL_S.set_decoder(funct7 = 0x08, op = 0x53);
 
   FDIV_S.set_asm("FDIV.S %reg, %reg, %reg", rd, rs1, rs2);
-  FDIV_S.set_decoder(funct7 = 0x0C, funct3 = 0x3, op = 0x53);
+  FDIV_S.set_decoder(funct7 = 0x0C, op = 0x53);
 
   FSQRT_S.set_asm("FSQRT.S %reg, %reg, %reg", rd, rs1, rs2);
-  FSQRT_S.set_decoder(funct7 = 0x2C, rs2 = 0x00, funct3 = 0x3, op = 0x53);
+  FSQRT_S.set_decoder(funct7 = 0x2C, rs2 = 0x00, op = 0x53);
 
   FMIN_S.set_asm("FMIN.S %reg, %reg, %reg", rd, rs1, rs2);
-  FMIN_S.set_decoder(funct7 = 0x14, funct3 = 0x3, op = 0x53);
+  FMIN_S.set_decoder(funct7 = 0x14, funct3 = 0, op = 0x53);
 
   FMAX_S.set_asm("FMAX.S %reg, %reg, %reg", rd, rs1, rs2);
   FMAX_S.set_decoder(funct7 = 0x14, funct3 = 0x1, op = 0x53);
 
   FMADD_S.set_asm("FMADD.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
-  FMADD_S.set_decoder(funct2 = 0, funct3 = 0x3, op = 0x43);
+  FMADD_S.set_decoder(funct2 = 0, op = 0x43);
 
   FMSUB_S.set_asm("FMSUB.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
-  FMSUB_S.set_decoder(funct2 = 0, funct3 = 0x3, op = 0x47);
+  FMSUB_S.set_decoder(funct2 = 0, op = 0x47);
 
   FNMSUB_S.set_asm("FNMSUB.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
-  FNMSUB_S.set_decoder(funct2 = 0, funct3 = 0x3, op = 0x4B);
+  FNMSUB_S.set_decoder(funct2 = 0, op = 0x4B);
 
   FNMADD_S.set_asm("FNMADD.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
-  FNMADD_S.set_decoder(funct2 = 0, funct3 = 0x3, op = 0x4F);
+  FNMADD_S.set_decoder(funct2 = 0, op = 0x4F);
 
   FMADD_S.set_asm("FMADD.S %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
-  FMADD_S.set_decoder(funct2 = 0, funct3 = 0x3, op = 0x43);
+  FMADD_S.set_decoder(funct2 = 0, op = 0x43);
 
+  FCVT_W_S.set_asm("FCVT.W.S %reg, %reg", rd, rs1);
+  FCVT_W_S.set_decoder(funct7 = 0x60, rs2 = 0, op = 0x53);
+
+  FCVT_WU_S.set_asm("FCVT.WU.S %reg, %reg", rd, rs1);
+  FCVT_WU_S.set_decoder(funct7 = 0x60, rs2 = 1, op = 0x53);
+
+  FCVT_S_W.set_asm("FCVT.S.W %reg, %reg", rd, rs1);
+  FCVT_S_W.set_decoder(funct7 = 0x68, rs2 = 0, op = 0x53);
+
+  FCVT_S_WU.set_asm("FCVT.S.X %reg, %reg", rd, rs1);
+  FCVT_S_WU.set_decoder(funct7 = 0x68, rs2 = 1, op = 0x53);
+
+  FMV_X_S.set_asm("FMV.X.S %reg, %reg", rd, rs1);
+  FMV_X_S.set_decoder(funct7=0x70, rs1 = 0, funct3 = 0, op = 0x53);
+
+  FMV_S_X.set_asm("FMV.S.X %reg, %reg", rd, rs1);
+  FMV_S_X.set_decoder(funct7=0x78, rs1 = 0, funct3 = 0, op = 0x53);
+
+  FEQ_S.set_asm("FEQ.S %reg, %reg, %reg", rd, rs1, rs2);
+  FEQ_S.set_decoder(funct7 = 0x50, funct3 = 2, op = 0x53);
+
+  FLT_S.set_asm("FLT.S %reg, %reg, %reg", rd, rs1, rs2);
+  FLT_S.set_decoder(funct7 = 0x50, funct3 = 1, op = 0x53);
+
+  FLE_S.set_asm("FLE.S %reg, %reg, %reg", rd, rs1, rs2);
+  FLE_S.set_decoder(funct7 = 0x50, funct3 = 0, op = 0x53);
+
+  FMV_S.set_asm("FMV.S %reg, %reg", rd, rs1);
+  FMV_S.set_decoder(funct7 = 0x10, op = 0x53);
+
+  //RV32D
   FLD.set_asm("FLD %reg, %reg, %imm", rd, rs1, imm4+imm3+imm2+imm1);
   FLD.set_decoder(funct3 = 0x3, op=0x07);
 
   FSD.set_asm("FSD %reg, %reg, %exp", rs1, rs2, imm4+imm3+imm2+imm1);
   FSD.set_decoder(funct3 = 0x3, op = 0x27);
+
+  FADD_D.set_asm("FADD.D%reg, %reg, %reg", rd, rs1, rs2);
+  FADD_D.set_decoder(funct7 = 0x01, op = 0x53);
+
+  FSUB_D.set_asm("FSUB.D %reg, %reg, %reg", rd, rs1, rs2);
+  FSUB_D.set_decoder(funct7 = 0x05, op = 0x53);
+
+  FMUL_D.set_asm("FMUL.D %reg, %reg, %reg", rd, rs1, rs2);
+  FMUL_D.set_decoder(funct7 = 0x09, op = 0x53);
+
+  FDIV_D.set_asm("FDIV.D %reg, %reg, %reg", rd, rs1, rs2);
+  FDIV_D.set_decoder(funct7 = 0x0D, op = 0x53);
+
+  FSQRT_D.set_asm("FSQRT.D %reg, %reg, %reg", rd, rs1, rs2);
+  FSQRT_D.set_decoder(funct7 = 0x2D, rs2 = 0x00, op = 0x53);
+
+  FMIN_D.set_asm("FMIN.D %reg, %reg, %reg", rd, rs1, rs2);
+  FMIN_D.set_decoder(funct7 = 0x15, funct3 = 0, op = 0x53);
+
+  FMAX_D.set_asm("FMAX.D %reg, %reg, %reg", rd, rs1, rs2);
+  FMAX_D.set_decoder(funct7 = 0x15, funct3 = 0x1, op = 0x53);
+
+  FMADD_D.set_asm("FMADD.D %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
+  FMADD_D.set_decoder(funct2 = 1, op = 0x43);
+
+  FMSUB_D.set_asm("FMSUB.D %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
+  FMSUB_D.set_decoder(funct2 = 1, op = 0x47);
+
+  FNMSUB_D.set_asm("FNMSUB.D %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
+  FNMSUB_D.set_decoder(funct2 = 1, op = 0x4B);
+
+  FNMADD_D.set_asm("FNMADD.D %reg, %reg, %reg, %reg", rd, rs1, rs2, rs3);
+  FNMADD_D.set_decoder(funct2 = 1, op = 0x4F);
+
+  FCVT_S_D.set_asm("FCVT.S.D %reg, %reg", rd, rs1);
+  FCVT_S_D.set_decoder(funct7 = 0x20, rs2 = 1, op = 0x53);
+
+  FCVT_D_S.set_asm("FCVT.D.S %reg, %reg", rd, rs1);
+  FCVT_D_S.set_decoder(funct7 = 0x20, rs2 = 0, op = 0x53);
+
+  FCVT_W_D.set_asm("FCVT.W.D %reg, %reg", rd, rs1);
+  FCVT_W_D.set_decoder(funct7 = 0x61, rs2 = 0, op = 0x53);
+
+  FCVT_WU_D.set_asm("FCVT.WU.D %reg, %reg", rd, rs1);
+  FCVT_WU_D.set_decoder(funct7 = 0x61, rs2 = 1, op = 0x53);
+
+  FCVT_D_W.set_asm("FCVT.D.W %reg, %reg", rd, rs1);
+  FCVT_D_W.set_decoder(funct7 = 0x69, rs2 = 0, op = 0x53);
+
+  FCVT_D_WU.set_asm("FCVT.D.WU %reg, %reg", rd, rs1);
+  FCVT_D_WU.set_decoder(funct7 = 0x69, rs2 = 1, op = 0x53);
+
+  FMV_D.set_asm("FMV.D %reg, %reg", rd, rs1);
+  FMV_D.set_decoder(funct7 = 0x11, op = 0x53);
+
+  FEQ_D.set_asm("FEQ.D %reg, %reg, %reg", rd, rs1, rs2);
+  FEQ_D.set_decoder(funct7 = 0x51, funct3 = 2, op = 0x53);
+
+  FLT_D.set_asm("FLT.D %reg, %reg, %reg", rd, rs1, rs2);
+  FLT_D.set_decoder(funct7 = 0x51, funct3 = 1, op = 0x53);
+
+  FLE_D.set_asm("FLE.D %reg, %reg, %reg", rd, rs1, rs2);
+  FLE_D.set_decoder(funct7 = 0x51, funct3 = 0, op = 0x53);
   };
 };
