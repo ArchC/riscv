@@ -50,8 +50,8 @@ The following topics need further improvement:
 
    - Double-precision floating point instructions need testing.
 
-   - GDB: The RISC-V toolchain creates executables using DWARF version
-     4. Currently, ArchC is capable of retargeting GDB 6.4, which is
+   - GDB: The RISC-V toolchain creates executables using DWARF version 4.
+     Currently, ArchC is capable of retargeting GDB 6.4, which is
      quite outdated and can only read DWARF version 2. Therefore,
      acbingen at the official ArchC repo needs to be udpated in order
      to allow GDB debugging in this model.
