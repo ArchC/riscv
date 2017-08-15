@@ -106,6 +106,7 @@ AC_ISA(riscv){
     AUIPC.set_decoder(op = 0x17);
 
     JAL.set_asm("JAL %reg, %exp", rd, imm4+imm3+imm2+imm1);
+    JAL.set_asm("J %exp", imm4+imm3+imm2+imm1);
     JAL.set_decoder(op = 0x6F);
 
     JALR.set_asm("JALR %reg, %reg, %exp", rd, rs1, imm4+imm3+imm2+imm1);
