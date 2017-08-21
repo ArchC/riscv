@@ -58,7 +58,7 @@ void ac_behavior(begin) {
       RBF[regNum] = 0;
       RBF[regNum+32] = 0;
     }
-  fcsr = 0;
+  //fcsr = 0;
 }
 
 
@@ -172,7 +172,7 @@ void ac_behavior(LB) {
   int sign_ext;
   sign_ext = sign_extend(offset, 12);
   byte = DM.read_byte(RB[rs1] + sign_ext);
-  RB[rd] = sign_extend(byte, 7);
+  RB[rd] = sign_extend(byte, 8);
   dbg_printf("RB[rs1] = %#x, byte = %#x\n", RB[rs1], byte);
   dbg_printf("addr = %#x\n", RB[rs1] + sign_ext);
   dbg_printf("Result = %#x\n\n", RB[rd]);
