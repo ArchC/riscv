@@ -1116,7 +1116,7 @@ void ac_behavior(FEQ_S) {
   dbg_printf("FEQ.S r%d, r%d, r%d \n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
   dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
-  if ((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1)) {
+  if ((custom_isnan(load_float(rs1)) == 1) || (custom_isnan(load_float(rs2)) == 1)) {
     printf("Invalid Operation\n");
     RB[rd] = 0;
   }
@@ -1132,7 +1132,7 @@ void ac_behavior(FLE_S) {
   dbg_printf("FLE.S r%d, r%d, r%d \n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
   dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
-  if ((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1)) {
+  if ((custom_isnan(load_float(rs1)) == 1) || (custom_isnan(load_float(rs2)) == 1)) {
     printf("Invalid Operation\n");
     RB[rd] = 0;
   }
@@ -1148,7 +1148,7 @@ void ac_behavior(FLT_S) {
   dbg_printf("FLT.S r%d, r%d, r%d \n", rd, rs1, rs2);
   dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
   dbg_printf("RBF[rs2] = %f \n", load_float(rs2));
-  if ((isnan(load_float(rs1)) == 1) || (isnan(load_float(rs2)) == 1)) {
+  if ((custom_isnan(load_float(rs1)) == 1) || (custom_isnan(load_float(rs2)) == 1)) {
     printf("Invalid Operation\n");
     RB[rd] = 0;
   }
