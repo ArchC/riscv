@@ -17,6 +17,7 @@
 #include "riscv_isa.H"
 #include "riscv_isa_init.cpp"
 #include "riscv_bhv_macros.H"
+#include <fenv.h>
 
 // Uncomment for debug Information
 //#define DEBUG_MODEL
@@ -244,8 +245,10 @@ void ac_behavior(ADDI) {
     dbg_printf("NOP executed!");
   } else {
     int sign_ext;
+
     sign_ext = sign_extend(imm, 12);
-    RB[rd] = RB[rs1] + sign_ext;
+    ac_Sword rs1_value = RB[rs1];
+    RB[rd] = rs1_value + sign_ext;
     dbg_printf("RB[rs1] = %d\n", RB[rs1]);
     dbg_printf("imm = %d\n", sign_ext);
     dbg_printf("Result = %d\n\n", RB[rd]);
