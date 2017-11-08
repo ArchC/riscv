@@ -398,11 +398,20 @@ AC_ISA(riscv){
     FCVT_S_WU.set_asm("FCVT.S.X %reg, %reg", rd, rs1);
     FCVT_S_WU.set_decoder(funct7 = 0x68, rs2 = 1, op = 0x53);
 
+    FSGNJ_S.set_asm("FSGNJ_S %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJ_S.set_decoder(funct7 =  0x10, funct3 = 0x00, op = 0x53);
+
+    FSGNJN_S.set_asm("FSGNJN_S %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJN_S.set_decoder(funct7 =  0x10, funct3 = 0x01, op = 0x53);
+
+    FSGNJX_S.set_asm("FSGNJX_S %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJX_S.set_decoder(funct7 =  0x10, funct3 = 0x02, op = 0x53);
+
     FMV_X_S.set_asm("FMV.X.S %reg, %reg", rd, rs1);
-    FMV_X_S.set_decoder(funct7 = 0x70, rs1 = 0, funct3 = 0, op = 0x53);
+    FMV_X_S.set_decoder(funct7 = 0x70, rs2 = 0, funct3 = 0, op = 0x53);
 
     FMV_S_X.set_asm("FMV.S.X %reg, %reg", rd, rs1);
-    FMV_S_X.set_decoder(funct7 = 0x78, rs1 = 0, funct3 = 0, op = 0x53);
+    FMV_S_X.set_decoder(funct7 = 0x78, rs2 = 0, funct3 = 0, op = 0x53);
 
     FEQ_S.set_asm("FEQ.S %reg, %reg, %reg", rd, rs1, rs2);
     FEQ_S.set_decoder(funct7 = 0x50, funct3 = 2, op = 0x53);
@@ -460,7 +469,7 @@ AC_ISA(riscv){
     FCVT_S_D.set_decoder(funct7 = 0x20, rs2 = 1, op = 0x53);
 
     FCVT_D_S.set_asm("FCVT.D.S %reg, %reg", rd, rs1);
-    FCVT_D_S.set_decoder(funct7 = 0x20, rs2 = 0, op = 0x53);
+    FCVT_D_S.set_decoder(funct7 = 0x21, rs2 = 0, op = 0x53);
 
     FCVT_W_D.set_asm("FCVT.W.D %reg, %reg", rd, rs1);
     FCVT_W_D.set_decoder(funct7 = 0x61, rs2 = 0, op = 0x53);
