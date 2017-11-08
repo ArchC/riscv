@@ -1354,8 +1354,9 @@ void ac_behavior(FCVT_D_W) {
   dbg_printf("FCVT.D.W r%d, r%d \n", rd, rs1);
   dbg_printf("RB[rs1] = %d \n", RB[rs1]);
   double temp;
-  temp = (double)RB[rs1];
-  save_float(temp, rd);
+  ac_Sword b = RB[rs1];
+  temp = (double)b;
+  save_double(temp, rd);
 }
 
 // Instruction FCVT_D_WU behaior method
@@ -1363,7 +1364,8 @@ void ac_behavior(FCVT_D_WU) {
   dbg_printf("FCVT.D.W r%d, r%d \n", rd, rs1);
   dbg_printf("RB[rs1] = %d \n", RB[rs1]);
   double temp;
-  temp = (double)RB[rs1];
+  ac_Uword b = RB[rs1];
+  temp = (double)b;
   save_double(temp, rd);
 }
 
