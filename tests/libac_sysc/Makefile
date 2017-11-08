@@ -1,15 +1,15 @@
 # Use: make TARGET=<target architecture>
 # It looks for the following commands for this target:
-CC       = riscv64-unknown-elf-gcc
-AR       = riscv64-unknown-elf-ar
-RANLIB   = riscv64-unknown-elf-ranlib
+CC       = riscv32-unknown-elf-gcc
+AR       = riscv32-unknown-elf-ar
+RANLIB   = riscv32-unknown-elf-ranlib
 
 # Flags
-CFLAGS   = -O2 -g -I. -I.. -m32 -Wa,-march=RV32IM -std=gnu99 -msoft-float 
+CFLAGS   = -O2 -g -I. -I.. -W -march=rv32imafd -std=gnu99 -mabi=ilp32d
 ARFLAGS  = cr
 RM       = rm
 RMFLAGS  = -rf
-TARGET   = riscv64-unknown-elf
+TARGET   = riscv32-unknown-elf
 
 
 ifneq (,$(findstring arm,$(TARGET)))
