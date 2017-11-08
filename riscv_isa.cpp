@@ -36,6 +36,7 @@ static int processors_started = 0;
 void ac_behavior(instruction) {
   dbg_printf("---PC=%#x---%lld\n", (int)ac_pc, ac_instr_counter);
   ac_pc = ac_pc + 4;
+  RB[0] = 0x0;
 }
 
 // Instruction Format behavior methods
