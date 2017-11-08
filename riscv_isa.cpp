@@ -1019,7 +1019,8 @@ void ac_behavior(FCVT_S_W) {
   dbg_printf("FCVT.S.W r%d, r%d \n", rd, rs1);
   dbg_printf("RB[rs1] = %d \n", RB[rs1]);
   float temp;
-  temp = (float)RB[rs1];
+  ac_Sword b = RB[rs1];
+  temp = (float)b;
   save_float(temp, rd);
 }
 
