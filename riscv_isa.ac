@@ -311,37 +311,37 @@ AC_ISA(riscv){
 
     // RV32A
     LR_W.set_asm("LR %reg, %reg", rd, rs1);
-    LR_W.set_decoder(funct7 = 0x1, funct3 = 0x2, op = 0x2f);
+    LR_W.set_decoder(funct5 = 0x2, funct3 = 0x2, op = 0x2f);
 
     SC_W.set_asm("SC %reg, %reg, %reg", rd, rs1, rs2);
-    SC_W.set_decoder(funct7 = 0x2, funct3 = 0x2, op = 0x2f);
+    SC_W.set_decoder(funct5 = 0x3, funct3 = 0x2, op = 0x2f);
 
     AMOSWAP_W.set_asm("AMOSWAP.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOSWAP_W.set_decoder(funct7 = 0x04, funct3 = 0x2, op = 0x2f);
+    AMOSWAP_W.set_decoder(funct5 = 0x01, funct3 = 0x2, op = 0x2f);
 
     AMOADD_W.set_asm("AMOADD.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOADD_W.set_decoder(funct7 = 0x00, funct3 = 0x2, op = 0x2f);
+    AMOADD_W.set_decoder(funct5 = 0x00, funct3 = 0x2, op = 0x2f);
 
     AMOXOR_W.set_asm("AMOXOR.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOXOR_W.set_decoder(funct7 = 0x10, funct3 = 0x2, op = 0x2f);
+    AMOXOR_W.set_decoder(funct5 = 0x04, funct3 = 0x2, op = 0x2f);
 
     AMOAND_W.set_asm("AMOAND.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOAND_W.set_decoder(funct7 = 0x30, funct3 = 0x2, op = 0x2f);
+    AMOAND_W.set_decoder(funct5 = 0x0C, funct3 = 0x2, op = 0x2f);
 
     AMOOR_W.set_asm("AMOOR.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOOR_W.set_decoder(funct7 = 0x20, funct3 = 0x2, op = 0x2f);
+    AMOOR_W.set_decoder(funct5 = 0x08, funct3 = 0x2, op = 0x2f);
 
     AMOMIN_W.set_asm("AMOMIN.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMIN_W.set_decoder(funct7 = 0x40, funct3 = 0x2, op = 0x2f);
+    AMOMIN_W.set_decoder(funct5 = 0x10, funct3 = 0x2, op = 0x2f);
 
     AMOMAX_W.set_asm("AMOMAX.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMAX_W.set_decoder(funct7 = 0x50, funct3 = 0x2, op = 0x2f);
+    AMOMAX_W.set_decoder(funct5 = 0x14, funct3 = 0x2, op = 0x2f);
 
     AMOMINU_W.set_asm("AMOMINU.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMINU_W.set_decoder(funct7 = 0x60, funct3 = 0x2, op = 0x2f);
+    AMOMINU_W.set_decoder(funct5 = 0x18, funct3 = 0x2, op = 0x2f);
 
     AMOMAXU_W.set_asm("AMOMAXU.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMAXU_W.set_decoder(funct7 = 0x70, funct3 = 0x2, op = 0x2f);
+    AMOMAXU_W.set_decoder(funct5 = 0x1C, funct3 = 0x2, op = 0x2f);
 
     // RV32F
     FLW.set_asm("FLW %reg, %reg, %exp", rd, rs1, imm4 + imm3 + imm2 + imm1);
