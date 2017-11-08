@@ -59,7 +59,9 @@ void ac_behavior(begin) {
       RBF[regNum] = 0;
       RBF[regNum+32] = 0;
     }
-  //fcsr = 0;
+    fcsr = 0;
+    frm = 0;
+    fflags = 0;
 }
 
 
@@ -400,6 +402,41 @@ void ac_behavior(RDINSTRET) { dbg_printf("RDINSTRET r%d\n", rd); }
 
 // Instruction RDINSTRETH behavior method.
 void ac_behavior(RDINSTRETH) { dbg_printf("RDINSTRETH r%d\n", rd); }
+
+// Instruction FENCE behavior method.
+void ac_behavior(FENCE) { dbg_printf("FENCE r%d\n", rd); }
+
+// Instruction FENCE_I behavior method.
+void ac_behavior(FENCE_I) { dbg_printf("FENCE_I r%d\n", rd); }
+
+// Instruction CSRRW behavior method.
+void ac_behavior(CSRRW) {
+ dbg_printf("CSRRW csr:%d\n", csr);
+ ac_word tmp = RB[rd];
+ ac_reg<riscv_parms::ac_word> mapped = csr_map(csr);
+ if(rd != 0x0){
+  RB[rd] = mapped;
+ }
+ mapped = tmp;
+}
+
+// Instruction CSRRS behavior method.
+void ac_behavior(CSRRS) {
+ dbg_printf("CSRRS csr:%d\n", csr);
+ ac_reg<riscv_parms::ac_word> mapped = csr_map(csr);
+ ac_word tmp = RB[rd];
+ RB[rd] = mapped;
+ mapped |= tmp;
+}
+
+// Instruction CSRRC behavior method.
+void ac_behavior(CSRRC) {
+ dbg_printf("CSRRC csr:%d\n", csr);
+ ac_reg<riscv_parms::ac_word> mapped = csr_map(csr);
+ ac_word tmp = RB[rd];
+ RB[rd] = mapped;
+ mapped &= ~tmp;
+}
 
 // Instruction SB behavior method
 void ac_behavior(SB) {
