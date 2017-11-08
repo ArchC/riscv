@@ -17,6 +17,9 @@ AC_ARCH(riscv) {
   ac_regbank RB:32;
 
   ac_regbank RBF:64;
+
+  ac_reg fflags;
+  ac_reg frm;
   ac_reg fcsr;
 
   ac_wordsize 32;
