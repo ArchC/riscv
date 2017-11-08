@@ -1373,7 +1373,7 @@ void ac_behavior(FCVT_D_WU) {
 void ac_behavior(FCVT_S_D) {
   dbg_printf("FCVT.S.D r%d, r%d", rd, rs1);
   dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
-  double temp;
+  float temp;
   temp = (float)(load_double(rs1));
   save_float(temp, rd);
 }
@@ -1382,7 +1382,7 @@ void ac_behavior(FCVT_S_D) {
 void ac_behavior(FCVT_D_S) {
   dbg_printf("FCVT.D.S r%d, r%d", rd, rs1);
   dbg_printf("RBF[rs1] = %f \n", load_double(rs1));
-  float temp;
+  double temp;
   temp = (double)(load_float(rs1));
   save_double(temp, rd);
 }
