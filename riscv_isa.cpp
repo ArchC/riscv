@@ -755,7 +755,7 @@ void ac_behavior(AMOADD_W) {
   RB[rd] = DM.read(RB[rs1]);
   dbg_printf("RB[rd] = %d\n", RB[rd]);
   dbg_printf("RB[rs2] = %d\n", RB[rs2]);
-  DM.write(RB[rs1], (RB[rd] + RB[rs2]));
+  DM.write(RB[rs1], ((ac_Sword)RB[rd] + (ac_Sword)RB[rs2]));
   dbg_printf("Result = %d\n\n", RB[rd] + RB[rs2]);
 }
 
