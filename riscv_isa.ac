@@ -15,13 +15,13 @@ AC_ISA(riscv){
   };
 
   ac_format Type_R =
-    "%funct7:7 %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
+    "[%funct7:7 | %funct5:5 %aq:1 %rl:1] %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
 
   ac_format Type_R4 =
     "%rs3:5 %funct2:2 %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
 
   ac_format Type_I =
-    "%imm4:1 %imm3:6 %imm2:4 %imm1:1 %rs1:5 %funct3:3 %rd:5 %op:7";
+    "[%imm4:1 %imm3:6 %imm2:4 %imm1:1 | %imm8:4 %imm7:4 %imm6:4 | %csr:12] %rs1:5 %funct3:3 %rd:5 %op:7";
 
   ac_format Type_S =
     "%imm4:1 %imm3:6 %rs2:5 %rs1:5 %funct3:3 %imm2:4 %imm1:1 %op:7";
