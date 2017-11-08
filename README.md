@@ -17,7 +17,7 @@ acsim riscv.ac -abi     (Create the simulator)
 make                    (Compile it)
 `````````
 
-Use the official RISC-V toolchain for creating the executables. Follow
+Use the official [RISC-V toolchain](https://github.com/riscv/riscv-gnu-toolchain/) for creating the executables. Follow
 the steps on the RISC-V page to download the toolchain. Use the master branch when generating the toolchain binaries.
 
 Configure GCC for RISC-V with the following options to enable 32-bit
