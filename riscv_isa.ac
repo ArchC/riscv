@@ -45,6 +45,10 @@ AC_ISA(riscv){
   ac_instr<Type_I> SLLI, SRLI, SRAI;
   ac_instr<Type_I> SCALL, SBREAK, RDCYCLE, RDCYCLEH, RDTIME, RDTIMEH, RDINSTRET;
   ac_instr<Type_I> RDINSTRETH;
+  ac_instr<Type_I> FENCE, FENCE_I;
+
+  ac_instr<Type_I> CSRRS, CSRRW, CSRRC;
+
 
   ac_instr<Type_S> SB, SH, SW;
 
@@ -69,6 +73,7 @@ AC_ISA(riscv){
   ac_instr<Type_R> FADD_S, FSUB_S, FMUL_S, FDIV_S, FMIN_S, FMAX_S, FSQRT_S;
   ac_instr<Type_R4> FMADD_S, FMSUB_S, FNMSUB_S, FNMADD_S;
   ac_instr<Type_R> FCVT_W_S, FCVT_WU_S, FCVT_S_WU, FCVT_S_W;
+  ac_instr<Type_R> FSGNJN_S, FSGNJ_S, FSGNJX_S;
   ac_instr<Type_R> FMV_X_S, FMV_S_X;
   ac_instr<Type_R> FEQ_S, FLT_S, FLE_S;
   ac_instr<Type_R> FMV_S;
@@ -79,6 +84,7 @@ AC_ISA(riscv){
   ac_instr<Type_R> FADD_D, FSUB_D, FMUL_D, FDIV_D, FMIN_D, FMAX_D, FSQRT_D;
   ac_instr<Type_R4> FMADD_D, FMSUB_D, FNMSUB_D, FNMADD_D;
   ac_instr<Type_R> FCVT_S_D, FCVT_D_S, FCVT_W_D, FCVT_WU_D, FCVT_D_W, FCVT_D_WU;
+  ac_instr<Type_R> FSGNJ_D, FSGNJN_D, FSGNJX_D;
   ac_instr<Type_R> FMV_D;
   ac_instr<Type_R> FEQ_D, FLT_D, FLE_D;
 
@@ -96,6 +102,14 @@ AC_ISA(riscv){
   // Floating-point register names
   ac_asm_map freg {
     "$f"[0..31] = [0..31];
+  }
+
+  ac_asm_map systemreg {
+    "$"[0..3] = [0..3];
+    "$csr" = 0;
+    "$fflags" = 1;
+    "$frm" = 2;
+    "$fcsr" = 3;
   }
 
   ISA_CTOR(riscv){
@@ -249,6 +263,25 @@ AC_ISA(riscv){
     RDINSTRETH.set_asm("RDINSTRETH %reg", rd);
     RDINSTRETH.set_decoder(imm4 = 1, imm3 = 36, imm2 = 1, imm1 = 0, rs1 = 0x00,
                            funct3 = 0x2, op = 0x73);
+
+    FENCE.set_asm("FENCE %reg %reg", imm7, imm6);
+    FENCE.set_decoder(imm8 = 0x0, funct3 = 0x0, rs1 = 0x00, op = 0x0F);
+
+    FENCE_I.set_asm("FENCE_I");
+    FENCE_I.set_decoder(imm8 = 0x0, imm7 = 0x0, imm6 = 0x0,
+                                     funct3 = 0x1, rs1 = 0x00, op = 0x0F);
+
+    CSRRW.set_asm("CSRRW %reg %reg %reg", rd, imm4+imm3+imm2+imm1, rs1);
+    CSRRW.set_decoder(funct3=0x1, op=0x73);
+
+    CSRRS.set_asm("CSRRS %reg %reg %reg", rd, imm4+imm3+imm2+imm1, rs1);
+    CSRRS.set_asm("FRRM %reg", imm2="$frm", rs1="$x0", rd);
+    CSRRS.set_decoder(funct3=0x2, op=0x73);
+
+    CSRRC.set_asm("CSRRC %reg %reg %reg", rd, imm4+imm3+imm2+imm1, rs1);
+    CSRRC.set_decoder(funct3=0x3, op=0x73);
+
+
 
     // RV32M
 
