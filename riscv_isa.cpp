@@ -1029,15 +1029,76 @@ void ac_behavior(FCVT_S_WU) {
   dbg_printf("FCVT.S.W r%d, r%d \n", rd, rs1);
   dbg_printf("RB[rs1] = %d \n", RB[rs1]);
   float temp;
-  temp = (float)RB[rs1];
+  ac_Uword b = RB[rs1];
+  temp = (float)b;
   save_float(temp, rd);
 }
+
+// Instruction FSGNJ_S behavior method
+void ac_behavior(FSGNJ_S) {
+  dbg_printf("FSGNJ.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float_cast f1 = { .f = load_float(rs1) };
+  float_cast f2 = { .f = load_float(rs2) };
+  f1.parts.sign = f2.parts.sign;
+  save_float(f1.f, rd);
+}
+// Instruction FSGNJN_S behavior method
+void ac_behavior(FSGNJN_S) {
+  dbg_printf("FSGNJ.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float_cast f1 = { .f = load_float(rs1) };
+  float_cast f2 = { .f = load_float(rs2) };
+  f1.parts.sign = !f2.parts.sign;
+  save_float(f1.f, rd);
+}
+
+// Instruction FSGNJX_S behavior method
+void ac_behavior(FSGNJX_S) {
+  dbg_printf("FSGNJX.S r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  float_cast f1 = { .f = load_float(rs1) };
+  float_cast f2 = { .f = load_float(rs2) };
+  f1.parts.sign = f1.parts.sign ^ f2.parts.sign;
+  save_float(f1.f, rd);
+}
+
+// Instruction FSGNJ_D behavior method
+void ac_behavior(FSGNJ_D) {
+  dbg_printf("FSGNJ.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double_cast d1 = { .d = load_double(rs1) };
+  double_cast d2 = { .d = load_double(rs2) };
+  d1.parts.sign = d2.parts.sign;
+  save_double(d1.d, rd);
+}
+// Instruction FSGNJN_D behavior method
+void ac_behavior(FSGNJN_D) {
+  dbg_printf("FSGNJ.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double_cast d1 = { .d = load_double(rs1) };
+  double_cast d2 = { .d = load_double(rs2) };
+  d1.parts.sign = !d2.parts.sign;
+  save_double(d1.d, rd);
+}
+
+// Instruction FSGNJX_D behavior method
+void ac_behavior(FSGNJX_D) {
+  dbg_printf("FSGNJX.D r%d, r%d, r%d \n", rd, rs1, rs2);
+  dbg_printf("RB[rs1] = %d \n", RB[rs1]);
+  double_cast d1 = { .d = load_double(rs1) };
+  double_cast d2 = { .d = load_double(rs2) };
+  d1.parts.sign = d1.parts.sign ^ d2.parts.sign;
+  save_double(d1.d, rd);
+}
+
 
 // Instruction FMV_X_S behavior method
 void ac_behavior(FMV_X_S) {
   dbg_printf("FMV.X.S r%d, r%d \n", rd, rs1);
   dbg_printf("RBF[rs1] = %f \n", load_float(rs1));
-  RB[rd] = (int)load_float(rs1);
+  memcpy(&RB[rd], &RBF[rs1], sizeof(uint32_t));
+  // RB[rd] = (int)load_float(rs1);
   dbg_printf("RB[rd] = %d \n \n", RB[rd]);
 }
 
@@ -1045,7 +1106,8 @@ void ac_behavior(FMV_X_S) {
 void ac_behavior(FMV_S_X) {
   dbg_printf("FMV.S.X r%d, r%d \n", rd, rs1);
   dbg_printf("RB[rs1] = %d \n", RB[rs1]);
-  save_float(RB[rs1], rd);
+  memcpy(&RBF[rd], &RB[rs1], sizeof(uint32_t));
+  // save_float(RB[rs1], rd);
   dbg_printf("RBF[rd] = %f \n \n", load_float(rd));
 }
 
