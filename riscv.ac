@@ -16,12 +16,13 @@ AC_ARCH(riscv) {
   ac_mem DM:512M;
   ac_regbank RB:32;
 
-  ac_regbank RBF:32;
+  ac_regbank RBF:64;
+
+  ac_reg fflags;
+  ac_reg frm;
   ac_reg fcsr;
 
   ac_wordsize 32;
-
-  ac_reg id;
 
   ARCH_CTOR(riscv) {
     ac_isa("riscv_isa.ac");

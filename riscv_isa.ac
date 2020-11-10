@@ -15,13 +15,13 @@ AC_ISA(riscv){
   };
 
   ac_format Type_R =
-    "%funct7:7 %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
+    "[%funct7:7 | %funct5:5 %aq:1 %rl:1] %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
 
   ac_format Type_R4 =
     "%rs3:5 %funct2:2 %rs2:5 %rs1:5 %funct3:3 %rd:5 %op:7";
 
   ac_format Type_I =
-    "%imm4:1 %imm3:6 %imm2:4 %imm1:1 %rs1:5 %funct3:3 %rd:5 %op:7";
+    "[%imm4:1 %imm3:6 %imm2:4 %imm1:1 | %imm8:4 %imm7:4 %imm6:4 | %csr:12] %rs1:5 %funct3:3 %rd:5 %op:7";
 
   ac_format Type_S =
     "%imm4:1 %imm3:6 %rs2:5 %rs1:5 %funct3:3 %imm2:4 %imm1:1 %op:7";
@@ -45,6 +45,10 @@ AC_ISA(riscv){
   ac_instr<Type_I> SLLI, SRLI, SRAI;
   ac_instr<Type_I> SCALL, SBREAK, RDCYCLE, RDCYCLEH, RDTIME, RDTIMEH, RDINSTRET;
   ac_instr<Type_I> RDINSTRETH;
+  ac_instr<Type_I> FENCE, FENCE_I;
+
+  ac_instr<Type_I> CSRRS, CSRRW, CSRRC;
+
 
   ac_instr<Type_S> SB, SH, SW;
 
@@ -69,6 +73,7 @@ AC_ISA(riscv){
   ac_instr<Type_R> FADD_S, FSUB_S, FMUL_S, FDIV_S, FMIN_S, FMAX_S, FSQRT_S;
   ac_instr<Type_R4> FMADD_S, FMSUB_S, FNMSUB_S, FNMADD_S;
   ac_instr<Type_R> FCVT_W_S, FCVT_WU_S, FCVT_S_WU, FCVT_S_W;
+  ac_instr<Type_R> FSGNJN_S, FSGNJ_S, FSGNJX_S;
   ac_instr<Type_R> FMV_X_S, FMV_S_X;
   ac_instr<Type_R> FEQ_S, FLT_S, FLE_S;
   ac_instr<Type_R> FMV_S;
@@ -79,6 +84,7 @@ AC_ISA(riscv){
   ac_instr<Type_R> FADD_D, FSUB_D, FMUL_D, FDIV_D, FMIN_D, FMAX_D, FSQRT_D;
   ac_instr<Type_R4> FMADD_D, FMSUB_D, FNMSUB_D, FNMADD_D;
   ac_instr<Type_R> FCVT_S_D, FCVT_D_S, FCVT_W_D, FCVT_WU_D, FCVT_D_W, FCVT_D_WU;
+  ac_instr<Type_R> FSGNJ_D, FSGNJN_D, FSGNJX_D;
   ac_instr<Type_R> FMV_D;
   ac_instr<Type_R> FEQ_D, FLT_D, FLE_D;
 
@@ -98,6 +104,14 @@ AC_ISA(riscv){
     "$f"[0..31] = [0..31];
   }
 
+  ac_asm_map systemreg {
+    "$"[0..3] = [0..3];
+    "$csr" = 0;
+    "$fflags" = 1;
+    "$frm" = 2;
+    "$fcsr" = 3;
+  }
+
   ISA_CTOR(riscv){
     LUI.set_asm("LUI %reg, %exp", rd, imm);
     LUI.set_decoder(op = 0x37);
@@ -106,6 +120,7 @@ AC_ISA(riscv){
     AUIPC.set_decoder(op = 0x17);
 
     JAL.set_asm("JAL %reg, %exp", rd, imm4+imm3+imm2+imm1);
+    JAL.set_asm("J %exp", imm4+imm3+imm2+imm1);
     JAL.set_decoder(op = 0x6F);
 
     JALR.set_asm("JALR %reg, %reg, %exp", rd, rs1, imm4+imm3+imm2+imm1);
@@ -249,6 +264,25 @@ AC_ISA(riscv){
     RDINSTRETH.set_decoder(imm4 = 1, imm3 = 36, imm2 = 1, imm1 = 0, rs1 = 0x00,
                            funct3 = 0x2, op = 0x73);
 
+    FENCE.set_asm("FENCE %reg %reg", imm7, imm6);
+    FENCE.set_decoder(imm8 = 0x0, funct3 = 0x0, rs1 = 0x00, op = 0x0F);
+
+    FENCE_I.set_asm("FENCE_I");
+    FENCE_I.set_decoder(imm8 = 0x0, imm7 = 0x0, imm6 = 0x0,
+                                     funct3 = 0x1, rs1 = 0x00, op = 0x0F);
+
+    CSRRW.set_asm("CSRRW %reg %reg %reg", rd, imm4+imm3+imm2+imm1, rs1);
+    CSRRW.set_decoder(funct3=0x1, op=0x73);
+
+    CSRRS.set_asm("CSRRS %reg %reg %reg", rd, imm4+imm3+imm2+imm1, rs1);
+    CSRRS.set_asm("FRRM %reg", imm2="$frm", rs1="$x0", rd);
+    CSRRS.set_decoder(funct3=0x2, op=0x73);
+
+    CSRRC.set_asm("CSRRC %reg %reg %reg", rd, imm4+imm3+imm2+imm1, rs1);
+    CSRRC.set_decoder(funct3=0x3, op=0x73);
+
+
+
     // RV32M
 
     MUL.set_asm("MUL %reg %reg %reg", rd, rs1, rs2);
@@ -277,37 +311,37 @@ AC_ISA(riscv){
 
     // RV32A
     LR_W.set_asm("LR %reg, %reg", rd, rs1);
-    LR_W.set_decoder(funct7 = 0x1, funct3 = 0x2, op = 0x2f);
+    LR_W.set_decoder(funct5 = 0x2, funct3 = 0x2, op = 0x2f);
 
     SC_W.set_asm("SC %reg, %reg, %reg", rd, rs1, rs2);
-    SC_W.set_decoder(funct7 = 0x2, funct3 = 0x2, op = 0x2f);
+    SC_W.set_decoder(funct5 = 0x3, funct3 = 0x2, op = 0x2f);
 
     AMOSWAP_W.set_asm("AMOSWAP.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOSWAP_W.set_decoder(funct7 = 0x04, funct3 = 0x2, op = 0x2f);
+    AMOSWAP_W.set_decoder(funct5 = 0x01, funct3 = 0x2, op = 0x2f);
 
     AMOADD_W.set_asm("AMOADD.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOADD_W.set_decoder(funct7 = 0x00, funct3 = 0x2, op = 0x2f);
+    AMOADD_W.set_decoder(funct5 = 0x00, funct3 = 0x2, op = 0x2f);
 
     AMOXOR_W.set_asm("AMOXOR.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOXOR_W.set_decoder(funct7 = 0x10, funct3 = 0x2, op = 0x2f);
+    AMOXOR_W.set_decoder(funct5 = 0x04, funct3 = 0x2, op = 0x2f);
 
     AMOAND_W.set_asm("AMOAND.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOAND_W.set_decoder(funct7 = 0x30, funct3 = 0x2, op = 0x2f);
+    AMOAND_W.set_decoder(funct5 = 0x0C, funct3 = 0x2, op = 0x2f);
 
     AMOOR_W.set_asm("AMOOR.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOOR_W.set_decoder(funct7 = 0x20, funct3 = 0x2, op = 0x2f);
+    AMOOR_W.set_decoder(funct5 = 0x08, funct3 = 0x2, op = 0x2f);
 
     AMOMIN_W.set_asm("AMOMIN.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMIN_W.set_decoder(funct7 = 0x40, funct3 = 0x2, op = 0x2f);
+    AMOMIN_W.set_decoder(funct5 = 0x10, funct3 = 0x2, op = 0x2f);
 
     AMOMAX_W.set_asm("AMOMAX.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMAX_W.set_decoder(funct7 = 0x50, funct3 = 0x2, op = 0x2f);
+    AMOMAX_W.set_decoder(funct5 = 0x14, funct3 = 0x2, op = 0x2f);
 
     AMOMINU_W.set_asm("AMOMINU.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMINU_W.set_decoder(funct7 = 0x60, funct3 = 0x2, op = 0x2f);
+    AMOMINU_W.set_decoder(funct5 = 0x18, funct3 = 0x2, op = 0x2f);
 
     AMOMAXU_W.set_asm("AMOMAXU.W %reg, %reg, %reg", rd, rs1, rs2);
-    AMOMAXU_W.set_decoder(funct7 = 0x70, funct3 = 0x2, op = 0x2f);
+    AMOMAXU_W.set_decoder(funct5 = 0x1C, funct3 = 0x2, op = 0x2f);
 
     // RV32F
     FLW.set_asm("FLW %reg, %reg, %exp", rd, rs1, imm4 + imm3 + imm2 + imm1);
@@ -364,11 +398,20 @@ AC_ISA(riscv){
     FCVT_S_WU.set_asm("FCVT.S.X %reg, %reg", rd, rs1);
     FCVT_S_WU.set_decoder(funct7 = 0x68, rs2 = 1, op = 0x53);
 
+    FSGNJ_S.set_asm("FSGNJ_S %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJ_S.set_decoder(funct7 =  0x10, funct3 = 0x00, op = 0x53);
+
+    FSGNJN_S.set_asm("FSGNJN_S %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJN_S.set_decoder(funct7 =  0x10, funct3 = 0x01, op = 0x53);
+
+    FSGNJX_S.set_asm("FSGNJX_S %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJX_S.set_decoder(funct7 =  0x10, funct3 = 0x02, op = 0x53);
+
     FMV_X_S.set_asm("FMV.X.S %reg, %reg", rd, rs1);
-    FMV_X_S.set_decoder(funct7 = 0x70, rs1 = 0, funct3 = 0, op = 0x53);
+    FMV_X_S.set_decoder(funct7 = 0x70, rs2 = 0, funct3 = 0, op = 0x53);
 
     FMV_S_X.set_asm("FMV.S.X %reg, %reg", rd, rs1);
-    FMV_S_X.set_decoder(funct7 = 0x78, rs1 = 0, funct3 = 0, op = 0x53);
+    FMV_S_X.set_decoder(funct7 = 0x78, rs2 = 0, funct3 = 0, op = 0x53);
 
     FEQ_S.set_asm("FEQ.S %reg, %reg, %reg", rd, rs1, rs2);
     FEQ_S.set_decoder(funct7 = 0x50, funct3 = 2, op = 0x53);
@@ -426,7 +469,7 @@ AC_ISA(riscv){
     FCVT_S_D.set_decoder(funct7 = 0x20, rs2 = 1, op = 0x53);
 
     FCVT_D_S.set_asm("FCVT.D.S %reg, %reg", rd, rs1);
-    FCVT_D_S.set_decoder(funct7 = 0x20, rs2 = 0, op = 0x53);
+    FCVT_D_S.set_decoder(funct7 = 0x21, rs2 = 0, op = 0x53);
 
     FCVT_W_D.set_asm("FCVT.W.D %reg, %reg", rd, rs1);
     FCVT_W_D.set_decoder(funct7 = 0x61, rs2 = 0, op = 0x53);
@@ -439,6 +482,17 @@ AC_ISA(riscv){
 
     FCVT_D_WU.set_asm("FCVT.D.WU %reg, %reg", rd, rs1);
     FCVT_D_WU.set_decoder(funct7 = 0x69, rs2 = 1, op = 0x53);
+
+    FSGNJ_D.set_asm("FSGNJ_D %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJ_D.set_decoder(funct7 =  0x11, funct3 = 0x00, op = 0x53);
+
+    FSGNJN_D.set_asm("FSGNJN_D %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJN_D.set_decoder(funct7 =  0x11, funct3 = 0x01, op = 0x53);
+
+    FSGNJX_D.set_asm("FSGNJX_D %reg, %reg, %reg", rd, rs1, rs2);
+    FSGNJX_D.set_decoder(funct7 =  0x11, funct3 = 0x02, op = 0x53);
+
+
 
     FMV_D.set_asm("FMV.D %reg, %reg", rd, rs1);
     FMV_D.set_decoder(funct7 = 0x11, op = 0x53);

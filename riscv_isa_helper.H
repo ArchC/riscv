@@ -12,6 +12,27 @@
  *            the riscv_isa.cpp (riscv instruction behaviors).
  **/
 
+typedef union {
+  float f;
+  struct {
+    unsigned int mantisa : 23;
+    unsigned int exponent : 8;
+    unsigned int sign : 1;
+  } parts;
+  uint32_t data;
+} float_cast;
+
+typedef union {
+  double d;
+  struct {
+    unsigned long long mantisa : 52;
+    unsigned long long exponent : 11;
+    unsigned int sign : 1;
+  } parts;
+  uint64_t data;
+} double_cast;
+
+
  static inline int sign_extend(int word, int word_length){
   int sign_ext;
   int m = 0xFFFFFFFF;
@@ -49,3 +70,8 @@ inline void save_float(float input, uint32_t index) {
 static bool custom_isnan(double var) {
   return var != var;
 }
+
+#define csr_map(i) i==0x1? fflags:\
+                      i==0x2? frm:\
+                        i==0x3? fcsr:\
+                          fflags;

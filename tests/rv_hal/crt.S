@@ -17,6 +17,7 @@
 
   .text
   .globl _start
+  .equ memory_size, 0x20000000
 
 _start:
   lui sp,0x500
@@ -25,11 +26,13 @@ _start:
 //  mul t2,t1,t0
 //  sub sp,sp,t2
   jal main
-  sbreak
+  lui t0, 0x20000
+  jalr t0, 0x0
+  ebreak
 
 //_interrupt_handler:
 //  jal main
-//  sbreak
+//  ebreak
 
 .bss
 .align 8
